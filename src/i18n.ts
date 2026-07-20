@@ -40,6 +40,8 @@ const en: Dict = {
     "Obsigravity is not installed. Install BRAT, then add reallygood83/obsigravity. Opening the note only.",
   obsigravitySoftHandoff:
     "Opened note + Obsigravity. Run /note-surgeon with your request if auto-start did not fire.",
+  obsigravityUpdateFailed:
+    "Obsigravity update failed. The note was opened so you can retry from Obsigravity (/note-surgeon).",
   next: "Next card",
   nextTooltip: "Done with this note for now — go to the next card (does not archive).",
   archive: "Archive",
@@ -157,6 +159,8 @@ const ko: Dict = {
     "Obsigravity가 없습니다. BRAT 설치 후 reallygood83/obsigravity 를 추가하세요. 노트만 엽니다.",
   obsigravitySoftHandoff:
     "노트와 Obsigravity를 열었습니다. 자동 실행이 안 되면 /note-surgeon 으로 요청을 보내세요.",
+  obsigravityUpdateFailed:
+    "Obsigravity 업데이트에 실패했습니다. 노트를 열었으니 Obsigravity에서 /note-surgeon 으로 다시 시도해 보세요.",
   next: "다음 카드",
   nextTooltip: "이 노트는 일단 끝 — 다음 카드로 (보관하지 않음).",
   archive: "보관",

@@ -286,6 +286,7 @@ var en = {
   cancel: "Cancel",
   obsigravityMissing: "Obsigravity is not installed. Install BRAT, then add reallygood83/obsigravity. Opening the note only.",
   obsigravitySoftHandoff: "Opened note + Obsigravity. Run /note-surgeon with your request if auto-start did not fire.",
+  obsigravityUpdateFailed: "Obsigravity update failed. The note was opened so you can retry from Obsigravity (/note-surgeon).",
   next: "Next card",
   nextTooltip: "Done with this note for now \u2014 go to the next card (does not archive).",
   archive: "Archive",
@@ -383,6 +384,7 @@ var ko = {
   cancel: "\uCDE8\uC18C",
   obsigravityMissing: "Obsigravity\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4. BRAT \uC124\uCE58 \uD6C4 reallygood83/obsigravity \uB97C \uCD94\uAC00\uD558\uC138\uC694. \uB178\uD2B8\uB9CC \uC5FD\uB2C8\uB2E4.",
   obsigravitySoftHandoff: "\uB178\uD2B8\uC640 Obsigravity\uB97C \uC5F4\uC5C8\uC2B5\uB2C8\uB2E4. \uC790\uB3D9 \uC2E4\uD589\uC774 \uC548 \uB418\uBA74 /note-surgeon \uC73C\uB85C \uC694\uCCAD\uC744 \uBCF4\uB0B4\uC138\uC694.",
+  obsigravityUpdateFailed: "Obsigravity \uC5C5\uB370\uC774\uD2B8\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uB178\uD2B8\uB97C \uC5F4\uC5C8\uC73C\uB2C8 Obsigravity\uC5D0\uC11C /note-surgeon \uC73C\uB85C \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uBCF4\uC138\uC694.",
   next: "\uB2E4\uC74C \uCE74\uB4DC",
   nextTooltip: "\uC774 \uB178\uD2B8\uB294 \uC77C\uB2E8 \uB05D \u2014 \uB2E4\uC74C \uCE74\uB4DC\uB85C (\uBCF4\uAD00\uD558\uC9C0 \uC54A\uC74C).",
   archive: "\uBCF4\uAD00",
@@ -1172,31 +1174,47 @@ async function runInfoUpdate(app, locale, notePath, userPrompt) {
   const og = getObsigravity(app);
   if (!og) {
     showObsigravityInstallGuide(locale);
-    const file2 = app.vault.getAbstractFileByPath(notePath);
-    if (file2 instanceof import_obsidian6.TFile) {
-      await app.workspace.getLeaf(false).openFile(file2);
+    const file = app.vault.getAbstractFileByPath(notePath);
+    if (file instanceof import_obsidian6.TFile) {
+      await app.workspace.getLeaf(false).openFile(file);
     }
     return;
   }
   if (typeof og.startNoteUpdateFromPulse === "function") {
-    await og.startNoteUpdateFromPulse(notePath, userPrompt);
+    try {
+      await og.startNoteUpdateFromPulse(notePath, userPrompt);
+    } catch (e) {
+      console.error("[Vault Pulse] Obsigravity update failed", e);
+      new import_obsidian6.Notice(t(locale, "obsigravityUpdateFailed"), 8e3);
+      const file = app.vault.getAbstractFileByPath(notePath);
+      if (file instanceof import_obsidian6.TFile) {
+        await app.workspace.getLeaf(false).openFile(file);
+      }
+    }
     return;
   }
-  if (typeof og.queuePulseUpdate === "function") {
-    og.queuePulseUpdate(notePath, userPrompt);
-  }
-  const file = app.vault.getAbstractFileByPath(notePath);
-  if (file instanceof import_obsidian6.TFile) {
-    await app.workspace.getLeaf(false).openFile(file);
-  }
-  if (typeof og.activateView === "function") {
-    await og.activateView();
-  }
   try {
-    await app.commands.executeCommandById("obsigravity:update-note-from-pulse");
-  } catch {
+    if (typeof og.queuePulseUpdate === "function") {
+      og.queuePulseUpdate(notePath, userPrompt);
+    }
+    const file = app.vault.getAbstractFileByPath(notePath);
+    if (file instanceof import_obsidian6.TFile) {
+      await app.workspace.getLeaf(false).openFile(file);
+    }
+    if (typeof og.activateView === "function") {
+      await og.activateView();
+    }
+    try {
+      await app.commands.executeCommandById(
+        "obsigravity:update-note-from-pulse"
+      );
+    } catch {
+    }
+    new import_obsidian6.Notice(t(locale, "obsigravitySoftHandoff"), 8e3);
+  } catch (e) {
+    console.error("[Vault Pulse] Obsigravity soft handoff failed", e);
+    new import_obsidian6.Notice(t(locale, "obsigravityUpdateFailed"), 8e3);
   }
-  new import_obsidian6.Notice(t(locale, "obsigravitySoftHandoff"), 8e3);
 }
 
 // src/main.ts

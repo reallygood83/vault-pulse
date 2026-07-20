@@ -62,26 +62,43 @@ export async function runInfoUpdate(
   }
 
   if (typeof og.startNoteUpdateFromPulse === "function") {
-    await og.startNoteUpdateFromPulse(notePath, userPrompt);
+    try {
+      await og.startNoteUpdateFromPulse(notePath, userPrompt);
+    } catch (e) {
+      console.error("[Vault Pulse] Obsigravity update failed", e);
+      new Notice(t(locale, "obsigravityUpdateFailed"), 8000);
+      // Still open the note so the user can retry manually
+      const file = app.vault.getAbstractFileByPath(notePath);
+      if (file instanceof TFile) {
+        await app.workspace.getLeaf(false).openFile(file);
+      }
+    }
     return;
   }
 
   // Soft fallback for older Obsigravity
-  if (typeof og.queuePulseUpdate === "function") {
-    og.queuePulseUpdate(notePath, userPrompt);
-  }
-  const file = app.vault.getAbstractFileByPath(notePath);
-  if (file instanceof TFile) {
-    await app.workspace.getLeaf(false).openFile(file);
-  }
-  if (typeof og.activateView === "function") {
-    await og.activateView();
-  }
   try {
-    // @ts-expect-error Obsidian command API
-    await app.commands.executeCommandById("obsigravity:update-note-from-pulse");
-  } catch {
-    /* ignore */
+    if (typeof og.queuePulseUpdate === "function") {
+      og.queuePulseUpdate(notePath, userPrompt);
+    }
+    const file = app.vault.getAbstractFileByPath(notePath);
+    if (file instanceof TFile) {
+      await app.workspace.getLeaf(false).openFile(file);
+    }
+    if (typeof og.activateView === "function") {
+      await og.activateView();
+    }
+    try {
+      // @ts-expect-error Obsidian command API
+      await app.commands.executeCommandById(
+        "obsigravity:update-note-from-pulse"
+      );
+    } catch {
+      /* command may be missing on older builds */
+    }
+    new Notice(t(locale, "obsigravitySoftHandoff"), 8000);
+  } catch (e) {
+    console.error("[Vault Pulse] Obsigravity soft handoff failed", e);
+    new Notice(t(locale, "obsigravityUpdateFailed"), 8000);
   }
-  new Notice(t(locale, "obsigravitySoftHandoff"), 8000);
 }

@@ -1,7 +1,7 @@
 {
 	"id": "vault-pulse",
 	"name": "Vault Pulse",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"minAppVersion": "1.5.0",
 	"description": "Local vault radar + triage. Click to open, delete, Obsigravity info-update. KO/EN. No AI.",
 	"author": "reallygood83",
