@@ -1,0 +1,21 @@
+# npm
+node_modules/
+npm-debug.log*
+package-lock.json.bak
+
+# build intermediates
+*.tsbuildinfo
+.tsbuildinfo
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Obsidian local
+.obsidian/
+
+# env
+.env
+.env.*
