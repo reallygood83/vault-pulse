@@ -1,0 +1,80 @@
+.pulse-view {
+  padding: 12px 16px;
+}
+
+.pulse-muted {
+  opacity: 0.75;
+  font-size: 0.9em;
+}
+
+.pulse-toolbar {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 16px;
+  flex-wrap: wrap;
+}
+
+.pulse-queue-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pulse-queue-list li {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: var(--background-secondary);
+}
+
+.pulse-q-title {
+  font-weight: 600;
+}
+
+.pulse-q-explain {
+  opacity: 0.85;
+  font-size: 0.9em;
+  margin-top: 4px;
+}
+
+.pulse-q-score {
+  opacity: 0.6;
+  font-size: 0.8em;
+  margin-top: 4px;
+}
+
+.pulse-session-modal .pulse-timer {
+  font-size: 1.4em;
+  font-weight: 700;
+  margin: 8px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.pulse-session-modal .pulse-status {
+  opacity: 0.8;
+  margin-bottom: 12px;
+}
+
+.pulse-session-modal .pulse-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+  background: var(--background-secondary);
+  min-height: 120px;
+}
+
+.pulse-session-modal .pulse-path {
+  opacity: 0.65;
+  font-size: 0.85em;
+  word-break: break-all;
+}
+
+.pulse-session-modal .pulse-explain {
+  margin: 8px 0;
+}
+
+.pulse-actions {
+  margin-bottom: 8px;
+}

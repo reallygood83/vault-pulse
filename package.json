@@ -1,0 +1,28 @@
+{
+  "name": "obsidian-pulse",
+  "version": "0.1.0",
+  "description": "Local vault radar + daily 20-minute triage habit for large Obsidian vaults. No AI required.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "version": "node version-bump.mjs && git add manifest.json versions.json"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "pkm",
+    "triage",
+    "vault"
+  ],
+  "author": "reallygood83",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.25.0",
+    "obsidian": "latest",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3"
+  }
+}

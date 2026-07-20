@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-pulse",
+  "name": "Vault Pulse",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Local radar for large vaults: score stale/orphan/duplicate notes and run a focused daily triage session. No AI or network required.",
+  "author": "reallygood83",
+  "authorUrl": "https://github.com/reallygood83",
+  "isDesktopOnly": false
+}
