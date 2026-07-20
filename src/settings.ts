@@ -1,4 +1,5 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
+import { t, type PulseLocale } from "./i18n";
 import type VaultPulsePlugin from "./main";
 import type { PulseSettings } from "./types";
 
@@ -13,18 +14,39 @@ export class PulseSettingTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Vault Pulse" });
-    containerEl.createEl("p", {
-      text: "All processing is local. No AI. No network calls.",
-    });
-
+    const L = this.plugin.settings.locale;
     const s = this.plugin.settings;
 
+    containerEl.createEl("h2", { text: t(L, "settingsTitle") });
+    containerEl.createEl("p", { text: t(L, "settingsIntro") });
+
+    containerEl.createEl("h3", { text: t(L, "howToHeading") });
+    containerEl.createEl("p", {
+      cls: "pulse-muted",
+      text: t(L, "howToBody"),
+    });
+
     new Setting(containerEl)
-      .setName("Stale days")
-      .setDesc("Notes not modified for at least this many days can be flagged stale.")
-      .addText((t) =>
-        t.setValue(String(s.staleDays)).onChange(async (v) => {
+      .setName(t(L, "language"))
+      .setDesc(t(L, "languageDesc"))
+      .addDropdown((d) =>
+        d
+          .addOption("en", "English")
+          .addOption("ko", "한국어")
+          .setValue(s.locale)
+          .onChange(async (v) => {
+            s.locale = (v === "ko" ? "ko" : "en") as PulseLocale;
+            await this.plugin.saveSettings();
+            this.plugin.onLocaleChange();
+            this.display();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName(t(L, "staleDays"))
+      .setDesc(t(L, "staleDaysDesc"))
+      .addText((inp) =>
+        inp.setValue(String(s.staleDays)).onChange(async (v) => {
           const n = Number(v);
           if (!Number.isNaN(n) && n > 0) {
             s.staleDays = Math.floor(n);
@@ -34,10 +56,10 @@ export class PulseSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Session minutes")
-      .setDesc("Default focus session length (habit timebox).")
-      .addText((t) =>
-        t.setValue(String(s.sessionMinutes)).onChange(async (v) => {
+      .setName(t(L, "sessionMinutes"))
+      .setDesc(t(L, "sessionMinutesDesc"))
+      .addText((inp) =>
+        inp.setValue(String(s.sessionMinutes)).onChange(async (v) => {
           const n = Number(v);
           if (!Number.isNaN(n) && n > 0) {
             s.sessionMinutes = Math.floor(n);
@@ -47,10 +69,10 @@ export class PulseSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Session target count")
-      .setDesc('Number of cards per session, or "auto" (~minutes/1.5, clamped 5–20).')
-      .addText((t) =>
-        t
+      .setName(t(L, "sessionTarget"))
+      .setDesc(t(L, "sessionTargetDesc"))
+      .addText((inp) =>
+        inp
           .setValue(
             s.sessionTargetCount === "auto"
               ? "auto"
@@ -61,17 +83,18 @@ export class PulseSettingTab extends PluginSettingTab {
               s.sessionTargetCount = "auto";
             } else {
               const n = Number(v);
-              if (!Number.isNaN(n) && n > 0) s.sessionTargetCount = Math.floor(n);
+              if (!Number.isNaN(n) && n > 0)
+                s.sessionTargetCount = Math.floor(n);
             }
             await this.plugin.saveSettings();
           })
       );
 
     new Setting(containerEl)
-      .setName("Exclude folders")
-      .setDesc("Comma-separated folder prefixes to ignore (e.g. Archive, Templates).")
-      .addText((t) =>
-        t.setValue(s.excludeFolders.join(", ")).onChange(async (v) => {
+      .setName(t(L, "excludeFolders"))
+      .setDesc(t(L, "excludeFoldersDesc"))
+      .addText((inp) =>
+        inp.setValue(s.excludeFolders.join(", ")).onChange(async (v) => {
           s.excludeFolders = v
             .split(",")
             .map((x) => x.trim())
@@ -81,20 +104,20 @@ export class PulseSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Archive folder")
-      .setDesc("Archive action moves notes under this folder (year-month subfolder).")
-      .addText((t) =>
-        t.setValue(s.archiveFolder).onChange(async (v) => {
+      .setName(t(L, "archiveFolder"))
+      .setDesc(t(L, "archiveFolderDesc"))
+      .addText((inp) =>
+        inp.setValue(s.archiveFolder).onChange(async (v) => {
           s.archiveFolder = v.trim() || "Archive/Pulse";
           await this.plugin.saveSettings();
         })
       );
 
     new Setting(containerEl)
-      .setName("Snooze days")
-      .setDesc("How long Snooze hides a note from the queue.")
-      .addText((t) =>
-        t.setValue(String(s.snoozeDays)).onChange(async (v) => {
+      .setName(t(L, "snoozeDays"))
+      .setDesc(t(L, "snoozeDaysDesc"))
+      .addText((inp) =>
+        inp.setValue(String(s.snoozeDays)).onChange(async (v) => {
           const n = Number(v);
           if (!Number.isNaN(n) && n > 0) {
             s.snoozeDays = Math.floor(n);
@@ -104,10 +127,10 @@ export class PulseSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Max notes per folder")
-      .setDesc("Diversity cap so one folder does not fill the queue.")
-      .addText((t) =>
-        t.setValue(String(s.maxPerFolder)).onChange(async (v) => {
+      .setName(t(L, "maxPerFolder"))
+      .setDesc(t(L, "maxPerFolderDesc"))
+      .addText((inp) =>
+        inp.setValue(String(s.maxPerFolder)).onChange(async (v) => {
           const n = Number(v);
           if (!Number.isNaN(n) && n > 0) {
             s.maxPerFolder = Math.floor(n);
@@ -116,13 +139,13 @@ export class PulseSettingTab extends PluginSettingTab {
         })
       );
 
-    containerEl.createEl("h3", { text: "Daily habit schedule" });
+    containerEl.createEl("h3", { text: t(L, "scheduleHeading") });
 
     new Setting(containerEl)
-      .setName("Enable daily schedule")
-      .setDesc("When Obsidian is open at the set time, offer a session. Catch-up on next launch.")
-      .addToggle((t) =>
-        t.setValue(s.scheduleEnabled).onChange(async (v) => {
+      .setName(t(L, "scheduleEnabled"))
+      .setDesc(t(L, "scheduleEnabledDesc"))
+      .addToggle((tog) =>
+        tog.setValue(s.scheduleEnabled).onChange(async (v) => {
           s.scheduleEnabled = v;
           await this.plugin.saveSettings();
           this.plugin.reschedule();
@@ -130,38 +153,52 @@ export class PulseSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Schedule time")
-      .setDesc("Local 24h time, e.g. 21:00")
-      .addText((t) =>
-        t.setValue(s.scheduleTime).onChange(async (v) => {
+      .setName(t(L, "scheduleTime"))
+      .setDesc(t(L, "scheduleTimeDesc"))
+      .addText((inp) =>
+        inp.setValue(s.scheduleTime).onChange(async (v) => {
           s.scheduleTime = v.trim();
           await this.plugin.saveSettings();
           this.plugin.reschedule();
         })
       );
 
-    containerEl.createEl("h3", { text: "Signal weights" });
-    this.weightSetting(containerEl, s, "stale", "Stale weight");
-    this.weightSetting(containerEl, s, "orphan", "Orphan weight");
-    this.weightSetting(containerEl, s, "duplicate", "Duplicate weight");
-    this.weightSetting(containerEl, s, "avoidance", "Avoidance weight");
+    new Setting(containerEl)
+      .setName(t(L, "scheduleAutoStart"))
+      .setDesc(t(L, "scheduleAutoStartDesc"))
+      .addToggle((tog) =>
+        tog.setValue(s.scheduleAutoStart).onChange(async (v) => {
+          s.scheduleAutoStart = v;
+          await this.plugin.saveSettings();
+        })
+      );
+
+    containerEl.createEl("h3", { text: t(L, "weightsHeading") });
+    this.weightSetting(containerEl, s, L, "stale", "weightStale");
+    this.weightSetting(containerEl, s, L, "orphan", "weightOrphan");
+    this.weightSetting(containerEl, s, L, "duplicate", "weightDuplicate");
+    this.weightSetting(containerEl, s, L, "avoidance", "weightAvoidance");
 
     containerEl.createEl("p", {
       cls: "pulse-muted",
-      text: `Streak: ${s.streakDays} day(s). Last session: ${s.lastSessionDate || "—"}`,
+      text: t(L, "streakLine", {
+        days: s.streakDays,
+        last: s.lastSessionDate || "—",
+      }),
     });
   }
 
   private weightSetting(
     containerEl: HTMLElement,
     s: PulseSettings,
+    locale: PulseLocale,
     key: keyof PulseSettings["weights"],
-    name: string
+    nameKey: string
   ): void {
     new Setting(containerEl)
-      .setName(name)
-      .addText((t) =>
-        t.setValue(String(s.weights[key])).onChange(async (v) => {
+      .setName(t(locale, nameKey))
+      .addText((inp) =>
+        inp.setValue(String(s.weights[key])).onChange(async (v) => {
           const n = Number(v);
           if (!Number.isNaN(n) && n >= 0) {
             s.weights[key] = n;

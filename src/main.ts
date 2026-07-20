@@ -12,6 +12,7 @@ import {
   shouldOfferCatchUpSession,
 } from "./session/schedule";
 import { PulseSettingTab } from "./settings";
+import { t } from "./i18n";
 import {
   DEFAULT_SETTINGS,
   type PulseIndexData,
@@ -30,10 +31,16 @@ interface PluginData {
 }
 
 export default class VaultPulsePlugin extends Plugin {
-  settings: PulseSettings = { ...DEFAULT_SETTINGS, weights: { ...DEFAULT_SETTINGS.weights }, snoozeUntil: {}, excludeFolders: [...DEFAULT_SETTINGS.excludeFolders] };
+  settings: PulseSettings = {
+    ...DEFAULT_SETTINGS,
+    weights: { ...DEFAULT_SETTINGS.weights },
+    snoozeUntil: {},
+    excludeFolders: [...DEFAULT_SETTINGS.excludeFolders],
+  };
   private index!: VaultIndex;
   private scheduleTimer: number | null = null;
   private cachedQueue: ScoredNote[] = [];
+  private sessionOpen = false;
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -42,7 +49,10 @@ export default class VaultPulsePlugin extends Plugin {
       this.app,
       () => this.settings,
       async (data) => {
-        await this.saveData({ settings: this.settings, index: data } satisfies PluginData);
+        await this.saveData({
+          settings: this.settings,
+          index: data,
+        } satisfies PluginData);
       },
       async () => {
         const raw = (await this.loadData()) as PluginData | null;
@@ -53,6 +63,7 @@ export default class VaultPulsePlugin extends Plugin {
 
     this.registerView(PULSE_VIEW_TYPE, (leaf) => {
       const view = new PulseView(leaf);
+      view.setLocale(this.settings.locale);
       view.setHandlers({
         onStart: () => void this.startSession(),
         onRefresh: async () => {
@@ -69,32 +80,38 @@ export default class VaultPulsePlugin extends Plugin {
 
     this.addCommand({
       id: "pulse-start-session",
-      name: "Start Pulse session",
+      name: t(this.settings.locale, "cmdStart"),
       callback: () => void this.startSession(),
     });
 
     this.addCommand({
       id: "pulse-open-view",
-      name: "Open Pulse view",
+      name: t(this.settings.locale, "cmdOpenView"),
       callback: () => void this.activateView(),
     });
 
     this.addCommand({
       id: "pulse-rescan",
-      name: "Rescan vault index",
+      name: t(this.settings.locale, "cmdRescan"),
       callback: () => void this.rescan(),
     });
 
     this.addSettingTab(new PulseSettingTab(this.app, this));
 
-    // Background first index
     void this.app.workspace.onLayoutReady(async () => {
       await this.index.ensureReady();
       await this.rebuildQueue(false);
       this.refreshOpenViews();
       this.reschedule();
+
       if (shouldOfferCatchUpSession(this.settings)) {
-        new Notice("Vault Pulse: catch-up session available. Run “Start Pulse session”.");
+        if (this.settings.scheduleAutoStart) {
+          new Notice(t(this.settings.locale, "catchUp"));
+          // slight delay so UI is ready
+          window.setTimeout(() => void this.startSession(), 600);
+        } else {
+          new Notice(t(this.settings.locale, "catchUpManual"));
+        }
       }
     });
   }
@@ -104,7 +121,6 @@ export default class VaultPulsePlugin extends Plugin {
       window.clearTimeout(this.scheduleTimer);
       this.scheduleTimer = null;
     }
-    // Detach pulse leaves so hot-reload does not stack views
     for (const leaf of this.app.workspace.getLeavesOfType(PULSE_VIEW_TYPE)) {
       leaf.detach();
     }
@@ -116,6 +132,9 @@ export default class VaultPulsePlugin extends Plugin {
       this.settings = {
         ...DEFAULT_SETTINGS,
         ...raw.settings,
+        locale: raw.settings.locale === "ko" ? "ko" : "en",
+        scheduleAutoStart:
+          raw.settings.scheduleAutoStart ?? DEFAULT_SETTINGS.scheduleAutoStart,
         weights: { ...DEFAULT_SETTINGS.weights, ...raw.settings.weights },
         excludeFolders:
           raw.settings.excludeFolders ?? [...DEFAULT_SETTINGS.excludeFolders],
@@ -132,39 +151,70 @@ export default class VaultPulsePlugin extends Plugin {
     } satisfies PluginData);
   }
 
+  /** Called when language changes in settings */
+  onLocaleChange(): void {
+    void this.rebuildQueue(false).then(() => this.refreshOpenViews());
+  }
+
   reschedule(): void {
     if (this.scheduleTimer != null) {
       window.clearTimeout(this.scheduleTimer);
       this.scheduleTimer = null;
     }
+    if (!this.settings.scheduleEnabled) return;
+
     const ms = msUntilNextSchedule(this.settings);
     if (ms == null) return;
+
     this.scheduleTimer = window.setTimeout(() => {
-      new Notice("Vault Pulse: scheduled triage time.");
-      void this.startSession();
+      void this.onScheduledFire();
       this.reschedule();
     }, ms);
   }
 
+  private async onScheduledFire(): Promise<void> {
+    const L = this.settings.locale;
+    // Skip if already completed today's session successfully
+    if (
+      this.settings.lastSessionDate === todayKey() &&
+      this.settings.lastSessionCompleted
+    ) {
+      return;
+    }
+    new Notice(t(L, "scheduledTime"));
+    if (this.settings.scheduleAutoStart) {
+      await this.startSession();
+    }
+  }
+
   async rescan(): Promise<void> {
-    new Notice("Vault Pulse: scanning vault…");
+    const L = this.settings.locale;
+    new Notice(t(L, "scanning"));
     await this.index.fullRebuild();
     await this.rebuildQueue(false);
     this.refreshOpenViews();
-    new Notice("Vault Pulse: scan complete.");
+    new Notice(t(L, "scanComplete"));
   }
 
   async rebuildQueue(forceRescan: boolean): Promise<void> {
     if (forceRescan) await this.index.fullRebuild();
     else await this.index.ensureReady();
-    const scored = scoreNotes(this.index.entries, this.settings);
+    const scored = scoreNotes(
+      this.index.entries,
+      this.settings,
+      Date.now(),
+      this.settings.locale
+    );
     this.cachedQueue = buildTodayQueue(scored, this.settings);
   }
 
   private refreshOpenViews(): void {
     for (const leaf of this.app.workspace.getLeavesOfType(PULSE_VIEW_TYPE)) {
       const v = leaf.view;
-      if (v instanceof PulseView) v.setQueue(this.cachedQueue);
+      if (v instanceof PulseView) {
+        v.setLocale(this.settings.locale);
+        v.setQueue(this.cachedQueue);
+      }
     }
   }
 
@@ -186,16 +236,23 @@ export default class VaultPulsePlugin extends Plugin {
   }
 
   async startSession(): Promise<void> {
+    if (this.sessionOpen) return;
     await this.rebuildQueue(false);
+    const L = this.settings.locale;
     if (this.cachedQueue.length === 0) {
-      new Notice("Vault Pulse: nothing to triage right now.");
+      new Notice(t(L, "nothingToTriage"));
       return;
     }
     const queue = [...this.cachedQueue];
+    this.sessionOpen = true;
     new SessionModal(this.app, queue, {
       minutes: this.settings.sessionMinutes,
+      locale: this.settings.locale,
       onAction: (note, action) => this.handleAction(note, action),
-      onComplete: (stats, completed) => void this.finishSession(stats, completed),
+      onComplete: (stats, completed) => {
+        this.sessionOpen = false;
+        void this.finishSession(stats, completed);
+      },
     }).open();
   }
 
@@ -203,6 +260,7 @@ export default class VaultPulsePlugin extends Plugin {
     note: ScoredNote,
     action: SessionAction
   ): Promise<void> {
+    const L = this.settings.locale;
     if (action === "open") {
       const file = this.app.vault.getAbstractFileByPath(note.path);
       if (file instanceof TFile) {
@@ -211,7 +269,9 @@ export default class VaultPulsePlugin extends Plugin {
       return;
     }
     if (action === "snooze") {
-      this.settings.snoozeUntil[note.path] = addDaysIso(this.settings.snoozeDays);
+      this.settings.snoozeUntil[note.path] = addDaysIso(
+        this.settings.snoozeDays
+      );
       await this.saveSettings();
       return;
     }
@@ -229,7 +289,7 @@ export default class VaultPulsePlugin extends Plugin {
         finalDest = `${folder}/${base}-${stamp}.md`;
       }
       await this.app.fileManager.renameFile(file, finalDest);
-      new Notice(`Archived → ${finalDest}`);
+      new Notice(t(L, "archived", { path: finalDest }));
     }
   }
 
@@ -250,9 +310,7 @@ export default class VaultPulsePlugin extends Plugin {
   ): Promise<void> {
     const today = todayKey();
     if (completed) {
-      if (this.settings.lastSessionDate === today) {
-        // same day re-run: keep streak
-      } else {
+      if (this.settings.lastSessionDate !== today) {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         if (this.settings.lastSessionDate === todayKey(yesterday)) {
@@ -271,7 +329,15 @@ export default class VaultPulsePlugin extends Plugin {
     const done =
       stats.opened + stats.archived + stats.snoozed + stats.skipped;
     new Notice(
-      `Pulse done: ${done}/${stats.target} · open ${stats.opened} · archive ${stats.archived} · snooze ${stats.snoozed} · skip ${stats.skipped} · streak ${this.settings.streakDays}`
+      t(this.settings.locale, "sessionDone", {
+        done,
+        target: stats.target,
+        opened: stats.opened,
+        archived: stats.archived,
+        snoozed: stats.snoozed,
+        skipped: stats.skipped,
+        streak: this.settings.streakDays,
+      })
     );
   }
 }

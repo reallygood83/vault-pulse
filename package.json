@@ -1,7 +1,7 @@
 {
   "name": "vault-pulse",
-  "version": "0.1.1",
-  "description": "Local vault radar + daily 20-minute triage habit for large Obsidian vaults. No AI required.",
+  "version": "0.2.0",
+  "description": "Local vault radar + daily timed triage for Obsidian. Korean/English UI. No AI.",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",

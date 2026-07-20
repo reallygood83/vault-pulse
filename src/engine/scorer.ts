@@ -1,3 +1,4 @@
+import { t, type PulseLocale } from "../i18n";
 import type {
   NoteIndexEntry,
   PulseSettings,
@@ -36,7 +37,8 @@ export function buildDuplicateClusters(
 export function scoreNotes(
   notes: Record<string, NoteIndexEntry>,
   settings: PulseSettings,
-  now = Date.now()
+  now = Date.now(),
+  locale: PulseLocale = settings.locale ?? "en"
 ): ScoredNote[] {
   const clusters = buildDuplicateClusters(notes);
   const pathToCluster = new Map<string, string>();
@@ -96,7 +98,7 @@ export function scoreNotes(
       title: n.title,
       score,
       signals,
-      explain: buildExplain(signals, daysStale, n.inLinks, n.path),
+      explain: buildExplain(signals, daysStale, n.inLinks, n.path, locale),
       daysStale,
       inLinks: n.inLinks,
       clusterKey: ck,
@@ -111,15 +113,17 @@ function buildExplain(
   signals: PulseSignal[],
   daysStale: number,
   inLinks: number,
-  path: string
+  path: string,
+  locale: PulseLocale
 ): string {
   const parts: string[] = [];
-  if (signals.includes("stale")) parts.push(`Stale ${daysStale}d`);
-  if (signals.includes("orphan")) parts.push("Orphan");
-  if (signals.includes("duplicate")) parts.push("Duplicate");
-  if (signals.includes("avoidance")) parts.push("Avoidance");
-  const folder = path.includes("/") ? path.slice(0, path.lastIndexOf("/")) : "/";
-  parts.push(folder === "" ? "root" : folder);
+  if (signals.includes("stale"))
+    parts.push(t(locale, "signalStale", { days: daysStale }));
+  if (signals.includes("orphan")) parts.push(t(locale, "signalOrphan"));
+  if (signals.includes("duplicate")) parts.push(t(locale, "signalDuplicate"));
+  if (signals.includes("avoidance")) parts.push(t(locale, "signalAvoidance"));
+  const folder = path.includes("/") ? path.slice(0, path.lastIndexOf("/")) : "";
+  parts.push(folder === "" ? t(locale, "rootFolder") : folder);
   void inLinks;
   return parts.join(" · ");
 }

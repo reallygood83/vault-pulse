@@ -101,8 +101,8 @@ function addDaysIso(days, from = /* @__PURE__ */ new Date()) {
 }
 function isSnoozed(untilIso, now = Date.now()) {
   if (!untilIso) return false;
-  const t = Date.parse(untilIso);
-  return !Number.isNaN(t) && t > now;
+  const t2 = Date.parse(untilIso);
+  return !Number.isNaN(t2) && t2 > now;
 }
 
 // src/index/vault-index.ts
@@ -211,8 +211,8 @@ var VaultIndex = class {
     const fm = content.startsWith("---") ? content.slice(3, content.indexOf("\n---", 3) + 1) : "";
     const tagLine = /tags:\s*\[([^\]]*)\]/i.exec(fm);
     if (tagLine) {
-      for (const t of tagLine[1].split(",")) {
-        const v = t.trim().replace(/^["']|["']$/g, "");
+      for (const t2 of tagLine[1].split(",")) {
+        const v = t2.trim().replace(/^["']|["']$/g, "");
         if (v) tags.add(v.replace(/^#/, ""));
       }
     }
@@ -253,6 +253,157 @@ var VaultIndex = class {
   }
 };
 
+// src/i18n.ts
+var en = {
+  pluginName: "Vault Pulse",
+  viewSubtitle: "Local radar for notes worth triaging. No AI. No network.",
+  startSession: "Start session",
+  rebuildQueue: "Rebuild queue",
+  todayQueue: "Today's queue",
+  emptyQueue: "No signals right now. Rescan after more notes age, or lower Stale days in settings.",
+  score: "score",
+  sessionTitle: "Vault Pulse session",
+  remaining: "remaining",
+  cardProgress: "Card {current} / {total} \xB7 processed {done}",
+  queueComplete: "Queue complete. Great work \u2014 end session or wait for the timer.",
+  open: "Open",
+  archive: "Archive",
+  snooze: "Snooze",
+  skip: "Skip",
+  endSession: "End session",
+  timeUp: "Pulse session time is up.",
+  actionFailed: "Pulse action failed. See console.",
+  scanning: "Vault Pulse: scanning vault\u2026",
+  scanComplete: "Vault Pulse: scan complete.",
+  nothingToTriage: "Vault Pulse: nothing to triage right now.",
+  scheduledTime: "Vault Pulse: scheduled session starting.",
+  catchUp: "Vault Pulse: catch-up session available \u2014 starting now.",
+  catchUpManual: "Vault Pulse: catch-up session available. Run \u201CStart session\u201D.",
+  archived: "Archived \u2192 {path}",
+  sessionDone: "Pulse done: {done}/{target} \xB7 open {opened} \xB7 archive {archived} \xB7 snooze {snoozed} \xB7 skip {skipped} \xB7 streak {streak}",
+  settingsTitle: "Vault Pulse",
+  settingsIntro: "All processing is local. No AI. No network calls.",
+  language: "Language",
+  languageDesc: "UI language for Vault Pulse (English / Korean).",
+  staleDays: "Stale days",
+  staleDaysDesc: "Notes not modified for at least this many days can be flagged stale.",
+  sessionMinutes: "Session minutes",
+  sessionMinutesDesc: "Default focus session length (habit timebox).",
+  sessionTarget: "Session target count",
+  sessionTargetDesc: 'Number of cards per session, or "auto" (~minutes/1.5, clamped 5\u201320).',
+  excludeFolders: "Exclude folders",
+  excludeFoldersDesc: "Comma-separated folder prefixes to ignore (e.g. Archive, Templates).",
+  archiveFolder: "Archive folder",
+  archiveFolderDesc: "Archive action moves notes under this folder (year-month subfolder).",
+  snoozeDays: "Snooze days",
+  snoozeDaysDesc: "How long Snooze hides a note from the queue.",
+  maxPerFolder: "Max notes per folder",
+  maxPerFolderDesc: "Diversity cap so one folder does not fill the queue.",
+  scheduleHeading: "Daily auto session",
+  scheduleEnabled: "Enable daily auto session",
+  scheduleEnabledDesc: "When Obsidian is open at the set local time, start a Pulse session automatically. Catch-up on next launch if you missed it.",
+  scheduleTime: "Session time",
+  scheduleTimeDesc: "Local 24h time, e.g. 21:00",
+  scheduleAutoStart: "Auto-open session window",
+  scheduleAutoStartDesc: "On: open the session modal at the scheduled time. Off: only show a notice.",
+  weightsHeading: "Signal weights",
+  weightStale: "Stale weight",
+  weightOrphan: "Orphan weight",
+  weightDuplicate: "Duplicate weight",
+  weightAvoidance: "Avoidance weight",
+  streakLine: "Streak: {days} day(s). Last session: {last}",
+  signalStale: "Stale {days}d",
+  signalOrphan: "Orphan",
+  signalDuplicate: "Duplicate",
+  signalAvoidance: "Avoidance",
+  rootFolder: "root",
+  cmdStart: "Start Pulse session",
+  cmdOpenView: "Open Pulse view",
+  cmdRescan: "Rescan vault index",
+  howToHeading: "How to use (simple)",
+  howToBody: "1) Rebuild queue \u2192 2) Start session \u2192 3) For each card: Open / Archive / Snooze / Skip \u2192 4) Repeat for ~20 minutes. Archive moves (does not delete)."
+};
+var ko = {
+  pluginName: "Vault Pulse",
+  viewSubtitle: "\uC190\uB308 \uB9CC\uD55C \uB178\uD2B8\uB97C \uACE8\uB77C \uC8FC\uB294 \uB85C\uCEEC \uB808\uC774\uB354\uC785\uB2C8\uB2E4. AI \uC5C6\uC74C \xB7 \uB124\uD2B8\uC6CC\uD06C \uC5C6\uC74C.",
+  startSession: "\uC138\uC158 \uC2DC\uC791",
+  rebuildQueue: "\uD050 \uB2E4\uC2DC \uB9CC\uB4E4\uAE30",
+  todayQueue: "\uC624\uB298\uC758 \uD050",
+  emptyQueue: "\uC9C0\uAE08 \uCD94\uCC9C\uD560 \uB178\uD2B8\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4. \uB178\uD2B8\uAC00 \uB354 \uC624\uB798\uB418\uAC70\uB098, \uC124\uC815\uC5D0\uC11C \u2018\uBC29\uCE58 \uC77C\uC218\u2019\uB97C \uB0AE\uCDB0 \uBCF4\uC138\uC694.",
+  score: "\uC810\uC218",
+  sessionTitle: "Vault Pulse \uC138\uC158",
+  remaining: "\uB0A8\uC74C",
+  cardProgress: "\uCE74\uB4DC {current} / {total} \xB7 \uCC98\uB9AC {done}",
+  queueComplete: "\uD050\uB97C \uBAA8\uB450 \uCC98\uB9AC\uD588\uC2B5\uB2C8\uB2E4. \uC138\uC158\uC744 \uB05D\uB0B4\uAC70\uB098 \uD0C0\uC774\uBA38\uAC00 \uB05D\uB0A0 \uB54C\uAE4C\uC9C0 \uAE30\uB2E4\uB824\uB3C4 \uB429\uB2C8\uB2E4.",
+  open: "\uC5F4\uAE30",
+  archive: "\uBCF4\uAD00",
+  snooze: "\uB098\uC911\uC5D0",
+  skip: "\uAC74\uB108\uB6F0\uAE30",
+  endSession: "\uC138\uC158 \uC885\uB8CC",
+  timeUp: "Pulse \uC138\uC158 \uC2DC\uAC04\uC774 \uB05D\uB0AC\uC2B5\uB2C8\uB2E4.",
+  actionFailed: "\uC791\uC5C5\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uCF58\uC194\uC744 \uD655\uC778\uD574 \uC8FC\uC138\uC694.",
+  scanning: "Vault Pulse: vault \uC2A4\uCE94 \uC911\u2026",
+  scanComplete: "Vault Pulse: \uC2A4\uCE94 \uC644\uB8CC.",
+  nothingToTriage: "Vault Pulse: \uC9C0\uAE08 \uC815\uB9AC\uD560 \uB178\uD2B8\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.",
+  scheduledTime: "Vault Pulse: \uC608\uC57D \uC138\uC158\uC744 \uC2DC\uC791\uD569\uB2C8\uB2E4.",
+  catchUp: "Vault Pulse: \uB193\uCE5C \uC138\uC158\uC744 \uC9C0\uAE08 \uC2DC\uC791\uD569\uB2C8\uB2E4.",
+  catchUpManual: "Vault Pulse: \uB193\uCE5C \uC138\uC158\uC774 \uC788\uC2B5\uB2C8\uB2E4. \u300C\uC138\uC158 \uC2DC\uC791\u300D\uC744 \uB20C\uB7EC \uC8FC\uC138\uC694.",
+  archived: "\uBCF4\uAD00\uB428 \u2192 {path}",
+  sessionDone: "\uC138\uC158 \uB05D: {done}/{target} \xB7 \uC5F4\uAE30 {opened} \xB7 \uBCF4\uAD00 {archived} \xB7 \uB098\uC911\uC5D0 {snoozed} \xB7 \uAC74\uB108\uB700 {skipped} \xB7 \uC5F0\uC18D {streak}\uC77C",
+  settingsTitle: "Vault Pulse",
+  settingsIntro: "\uBAA8\uB4E0 \uCC98\uB9AC\uB294 \uB85C\uCEEC\uC5D0\uC11C\uB9CC \uD569\uB2C8\uB2E4. AI \uC5C6\uC74C \xB7 \uB124\uD2B8\uC6CC\uD06C \uD638\uCD9C \uC5C6\uC74C.",
+  language: "\uC5B8\uC5B4",
+  languageDesc: "Vault Pulse \uD654\uBA74 \uC5B8\uC5B4 (\uC601\uC5B4 / \uD55C\uAD6D\uC5B4).",
+  staleDays: "\uBC29\uCE58 \uC77C\uC218",
+  staleDaysDesc: "\uC774 \uC77C\uC218 \uC774\uC0C1 \uC218\uC815\uD558\uC9C0 \uC54A\uC740 \uB178\uD2B8\uB97C \u2018\uC624\uB798\uB428(Stale)\u2019\uC73C\uB85C \uBCFC \uC218 \uC788\uC2B5\uB2C8\uB2E4.",
+  sessionMinutes: "\uC138\uC158 \uC2DC\uAC04(\uBD84)",
+  sessionMinutesDesc: "\uD55C \uBC88 \uC9D1\uC911 \uC138\uC158 \uAE38\uC774(\uC2B5\uAD00\uC6A9 \uD0C0\uC774\uBA38).",
+  sessionTarget: "\uC138\uC158 \uCE74\uB4DC \uC218",
+  sessionTargetDesc: '\uC138\uC158\uB2F9 \uCE74\uB4DC \uAC1C\uC218. "auto"\uBA74 \uB300\uB7B5 \uBD84\xF71.5 (5~20\uAC1C\uB85C \uC81C\uD55C).',
+  excludeFolders: "\uC81C\uC678 \uD3F4\uB354",
+  excludeFoldersDesc: "\uBB34\uC2DC\uD560 \uD3F4\uB354 \uC811\uB450\uC0AC(\uC27C\uD45C\uB85C \uAD6C\uBD84). \uC608: Archive, Templates",
+  archiveFolder: "\uBCF4\uAD00 \uD3F4\uB354",
+  archiveFolderDesc: "\u300C\uBCF4\uAD00\u300D \uC2DC \uB178\uD2B8\uB97C \uC774 \uD3F4\uB354 \uC544\uB798(\uC5F0-\uC6D4 \uD558\uC704 \uD3F4\uB354)\uB85C \uC62E\uAE41\uB2C8\uB2E4.",
+  snoozeDays: "\uB098\uC911\uC5D0 \uC77C\uC218",
+  snoozeDaysDesc: "\u300C\uB098\uC911\uC5D0\u300D\uB97C \uB204\uB974\uBA74 \uC774 \uC77C\uC218 \uB3D9\uC548 \uD050\uC5D0\uC11C \uC228\uAE41\uB2C8\uB2E4.",
+  maxPerFolder: "\uD3F4\uB354\uB2F9 \uCD5C\uB300 \uAC1C\uC218",
+  maxPerFolderDesc: "\uD55C \uD3F4\uB354 \uB178\uD2B8\uAC00 \uD050\uB97C \uB3C5\uC2DD\uD558\uC9C0 \uC54A\uB3C4\uB85D \uD558\uB294 \uC0C1\uD55C.",
+  scheduleHeading: "\uB9E4\uC77C \uC790\uB3D9 \uC138\uC158",
+  scheduleEnabled: "\uB9E4\uC77C \uC790\uB3D9 \uC138\uC158 \uCF1C\uAE30",
+  scheduleEnabledDesc: "Obsidian\uC774 \uCF1C\uC838 \uC788\uACE0 \uC124\uC815\uD55C \uC2DC\uAC01\uC774 \uB418\uBA74 Pulse \uC138\uC158\uC744 \uC790\uB3D9\uC73C\uB85C \uC5FD\uB2C8\uB2E4. \uB193\uCCE4\uB2E4\uBA74 \uB2E4\uC74C\uC5D0 \uC571\uC744 \uC5F4 \uB54C \uC774\uC5B4\uC11C \uC81C\uC548\uD569\uB2C8\uB2E4.",
+  scheduleTime: "\uC138\uC158 \uC2DC\uAC01",
+  scheduleTimeDesc: "\uB85C\uCEEC 24\uC2DC\uAC04 \uD615\uC2DD. \uC608: 21:00",
+  scheduleAutoStart: "\uC138\uC158 \uCC3D \uC790\uB3D9\uC73C\uB85C \uC5F4\uAE30",
+  scheduleAutoStartDesc: "\uCF1C\uAE30: \uC608\uC57D \uC2DC\uAC01\uC5D0 \uC138\uC158 \uCC3D\uC744 \uBC14\uB85C \uC5FD\uB2C8\uB2E4. \uB044\uAE30: \uC54C\uB9BC\uB9CC \uD45C\uC2DC\uD569\uB2C8\uB2E4.",
+  weightsHeading: "\uC2E0\uD638 \uAC00\uC911\uCE58",
+  weightStale: "\uC624\uB798\uB428 \uAC00\uC911\uCE58",
+  weightOrphan: "\uC678\uD1A8\uC774 \uAC00\uC911\uCE58",
+  weightDuplicate: "\uC911\uBCF5 \uAC00\uC911\uCE58",
+  weightAvoidance: "\uBBF8\uB8F8 \uAC00\uC911\uCE58",
+  streakLine: "\uC5F0\uC18D: {days}\uC77C \xB7 \uB9C8\uC9C0\uB9C9 \uC138\uC158: {last}",
+  signalStale: "\uC624\uB798\uB428 {days}\uC77C",
+  signalOrphan: "\uC678\uD1A8\uC774",
+  signalDuplicate: "\uC911\uBCF5",
+  signalAvoidance: "\uBBF8\uB8F8",
+  rootFolder: "\uB8E8\uD2B8",
+  cmdStart: "Pulse \uC138\uC158 \uC2DC\uC791",
+  cmdOpenView: "Pulse \uBCF4\uAE30 \uC5F4\uAE30",
+  cmdRescan: "vault \uC778\uB371\uC2A4 \uB2E4\uC2DC \uC2A4\uCE94",
+  howToHeading: "\uC0AC\uC6A9\uBC95 (\uAC04\uB2E8)",
+  howToBody: "1) \uD050 \uB2E4\uC2DC \uB9CC\uB4E4\uAE30 \u2192 2) \uC138\uC158 \uC2DC\uC791 \u2192 3) \uCE74\uB4DC\uB9C8\uB2E4 \uC5F4\uAE30/\uBCF4\uAD00/\uB098\uC911\uC5D0/\uAC74\uB108\uB6F0\uAE30 \u2192 4) \uC57D 20\uBD84 \uBC18\uBCF5. \uBCF4\uAD00\uC740 \uC0AD\uC81C\uD558\uC9C0 \uC54A\uACE0 \uD3F4\uB354\uB85C \uC62E\uAE41\uB2C8\uB2E4."
+};
+var TABLES = { en, ko };
+function t(locale, key, vars) {
+  const table = TABLES[locale] ?? en;
+  let s = table[key] ?? en[key] ?? key;
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      s = s.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
+    }
+  }
+  return s;
+}
+
 // src/engine/scorer.ts
 function buildDuplicateClusters(notes) {
   const byKey = /* @__PURE__ */ new Map();
@@ -277,7 +428,7 @@ function buildDuplicateClusters(notes) {
   }
   return clusters;
 }
-function scoreNotes(notes, settings, now = Date.now()) {
+function scoreNotes(notes, settings, now = Date.now(), locale = settings.locale ?? "en") {
   const clusters = buildDuplicateClusters(notes);
   const pathToCluster = /* @__PURE__ */ new Map();
   for (const [ck, paths] of clusters) {
@@ -321,7 +472,7 @@ function scoreNotes(notes, settings, now = Date.now()) {
       title: n.title,
       score,
       signals,
-      explain: buildExplain(signals, daysStale, n.inLinks, n.path),
+      explain: buildExplain(signals, daysStale, n.inLinks, n.path, locale),
       daysStale,
       inLinks: n.inLinks,
       clusterKey: ck
@@ -330,14 +481,15 @@ function scoreNotes(notes, settings, now = Date.now()) {
   scored.sort((a, b) => b.score - a.score);
   return scored;
 }
-function buildExplain(signals, daysStale, inLinks, path) {
+function buildExplain(signals, daysStale, inLinks, path, locale) {
   const parts = [];
-  if (signals.includes("stale")) parts.push(`Stale ${daysStale}d`);
-  if (signals.includes("orphan")) parts.push("Orphan");
-  if (signals.includes("duplicate")) parts.push("Duplicate");
-  if (signals.includes("avoidance")) parts.push("Avoidance");
-  const folder = path.includes("/") ? path.slice(0, path.lastIndexOf("/")) : "/";
-  parts.push(folder === "" ? "root" : folder);
+  if (signals.includes("stale"))
+    parts.push(t(locale, "signalStale", { days: daysStale }));
+  if (signals.includes("orphan")) parts.push(t(locale, "signalOrphan"));
+  if (signals.includes("duplicate")) parts.push(t(locale, "signalDuplicate"));
+  if (signals.includes("avoidance")) parts.push(t(locale, "signalAvoidance"));
+  const folder = path.includes("/") ? path.slice(0, path.lastIndexOf("/")) : "";
+  parts.push(folder === "" ? t(locale, "rootFolder") : folder);
   void inLinks;
   return parts.join(" \xB7 ");
 }
@@ -376,18 +528,18 @@ function shouldOfferCatchUpSession(settings, now = /* @__PURE__ */ new Date()) {
   if (settings.lastSessionDate === todayKey(now) && settings.lastSessionCompleted) {
     return false;
   }
-  const t = parseScheduleTime(settings.scheduleTime);
-  if (!t) return false;
+  const t2 = parseScheduleTime(settings.scheduleTime);
+  if (!t2) return false;
   const scheduled = new Date(now);
-  scheduled.setHours(t.h, t.m, 0, 0);
+  scheduled.setHours(t2.h, t2.m, 0, 0);
   return now.getTime() >= scheduled.getTime();
 }
 function msUntilNextSchedule(settings, now = /* @__PURE__ */ new Date()) {
   if (!settings.scheduleEnabled) return null;
-  const t = parseScheduleTime(settings.scheduleTime);
-  if (!t) return null;
+  const t2 = parseScheduleTime(settings.scheduleTime);
+  if (!t2) return null;
   const next = new Date(now);
-  next.setHours(t.h, t.m, 0, 0);
+  next.setHours(t2.h, t2.m, 0, 0);
   if (next.getTime() <= now.getTime()) {
     next.setDate(next.getDate() + 1);
   }
@@ -404,13 +556,25 @@ var PulseSettingTab = class extends import_obsidian2.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Vault Pulse" });
-    containerEl.createEl("p", {
-      text: "All processing is local. No AI. No network calls."
-    });
+    const L = this.plugin.settings.locale;
     const s = this.plugin.settings;
-    new import_obsidian2.Setting(containerEl).setName("Stale days").setDesc("Notes not modified for at least this many days can be flagged stale.").addText(
-      (t) => t.setValue(String(s.staleDays)).onChange(async (v) => {
+    containerEl.createEl("h2", { text: t(L, "settingsTitle") });
+    containerEl.createEl("p", { text: t(L, "settingsIntro") });
+    containerEl.createEl("h3", { text: t(L, "howToHeading") });
+    containerEl.createEl("p", {
+      cls: "pulse-muted",
+      text: t(L, "howToBody")
+    });
+    new import_obsidian2.Setting(containerEl).setName(t(L, "language")).setDesc(t(L, "languageDesc")).addDropdown(
+      (d) => d.addOption("en", "English").addOption("ko", "\uD55C\uAD6D\uC5B4").setValue(s.locale).onChange(async (v) => {
+        s.locale = v === "ko" ? "ko" : "en";
+        await this.plugin.saveSettings();
+        this.plugin.onLocaleChange();
+        this.display();
+      })
+    );
+    new import_obsidian2.Setting(containerEl).setName(t(L, "staleDays")).setDesc(t(L, "staleDaysDesc")).addText(
+      (inp) => inp.setValue(String(s.staleDays)).onChange(async (v) => {
         const n = Number(v);
         if (!Number.isNaN(n) && n > 0) {
           s.staleDays = Math.floor(n);
@@ -418,8 +582,8 @@ var PulseSettingTab = class extends import_obsidian2.PluginSettingTab {
         }
       })
     );
-    new import_obsidian2.Setting(containerEl).setName("Session minutes").setDesc("Default focus session length (habit timebox).").addText(
-      (t) => t.setValue(String(s.sessionMinutes)).onChange(async (v) => {
+    new import_obsidian2.Setting(containerEl).setName(t(L, "sessionMinutes")).setDesc(t(L, "sessionMinutesDesc")).addText(
+      (inp) => inp.setValue(String(s.sessionMinutes)).onChange(async (v) => {
         const n = Number(v);
         if (!Number.isNaN(n) && n > 0) {
           s.sessionMinutes = Math.floor(n);
@@ -427,33 +591,34 @@ var PulseSettingTab = class extends import_obsidian2.PluginSettingTab {
         }
       })
     );
-    new import_obsidian2.Setting(containerEl).setName("Session target count").setDesc('Number of cards per session, or "auto" (~minutes/1.5, clamped 5\u201320).').addText(
-      (t) => t.setValue(
+    new import_obsidian2.Setting(containerEl).setName(t(L, "sessionTarget")).setDesc(t(L, "sessionTargetDesc")).addText(
+      (inp) => inp.setValue(
         s.sessionTargetCount === "auto" ? "auto" : String(s.sessionTargetCount)
       ).onChange(async (v) => {
         if (v.trim().toLowerCase() === "auto") {
           s.sessionTargetCount = "auto";
         } else {
           const n = Number(v);
-          if (!Number.isNaN(n) && n > 0) s.sessionTargetCount = Math.floor(n);
+          if (!Number.isNaN(n) && n > 0)
+            s.sessionTargetCount = Math.floor(n);
         }
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian2.Setting(containerEl).setName("Exclude folders").setDesc("Comma-separated folder prefixes to ignore (e.g. Archive, Templates).").addText(
-      (t) => t.setValue(s.excludeFolders.join(", ")).onChange(async (v) => {
+    new import_obsidian2.Setting(containerEl).setName(t(L, "excludeFolders")).setDesc(t(L, "excludeFoldersDesc")).addText(
+      (inp) => inp.setValue(s.excludeFolders.join(", ")).onChange(async (v) => {
         s.excludeFolders = v.split(",").map((x) => x.trim()).filter(Boolean);
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian2.Setting(containerEl).setName("Archive folder").setDesc("Archive action moves notes under this folder (year-month subfolder).").addText(
-      (t) => t.setValue(s.archiveFolder).onChange(async (v) => {
+    new import_obsidian2.Setting(containerEl).setName(t(L, "archiveFolder")).setDesc(t(L, "archiveFolderDesc")).addText(
+      (inp) => inp.setValue(s.archiveFolder).onChange(async (v) => {
         s.archiveFolder = v.trim() || "Archive/Pulse";
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian2.Setting(containerEl).setName("Snooze days").setDesc("How long Snooze hides a note from the queue.").addText(
-      (t) => t.setValue(String(s.snoozeDays)).onChange(async (v) => {
+    new import_obsidian2.Setting(containerEl).setName(t(L, "snoozeDays")).setDesc(t(L, "snoozeDaysDesc")).addText(
+      (inp) => inp.setValue(String(s.snoozeDays)).onChange(async (v) => {
         const n = Number(v);
         if (!Number.isNaN(n) && n > 0) {
           s.snoozeDays = Math.floor(n);
@@ -461,8 +626,8 @@ var PulseSettingTab = class extends import_obsidian2.PluginSettingTab {
         }
       })
     );
-    new import_obsidian2.Setting(containerEl).setName("Max notes per folder").setDesc("Diversity cap so one folder does not fill the queue.").addText(
-      (t) => t.setValue(String(s.maxPerFolder)).onChange(async (v) => {
+    new import_obsidian2.Setting(containerEl).setName(t(L, "maxPerFolder")).setDesc(t(L, "maxPerFolderDesc")).addText(
+      (inp) => inp.setValue(String(s.maxPerFolder)).onChange(async (v) => {
         const n = Number(v);
         if (!Number.isNaN(n) && n > 0) {
           s.maxPerFolder = Math.floor(n);
@@ -470,34 +635,43 @@ var PulseSettingTab = class extends import_obsidian2.PluginSettingTab {
         }
       })
     );
-    containerEl.createEl("h3", { text: "Daily habit schedule" });
-    new import_obsidian2.Setting(containerEl).setName("Enable daily schedule").setDesc("When Obsidian is open at the set time, offer a session. Catch-up on next launch.").addToggle(
-      (t) => t.setValue(s.scheduleEnabled).onChange(async (v) => {
+    containerEl.createEl("h3", { text: t(L, "scheduleHeading") });
+    new import_obsidian2.Setting(containerEl).setName(t(L, "scheduleEnabled")).setDesc(t(L, "scheduleEnabledDesc")).addToggle(
+      (tog) => tog.setValue(s.scheduleEnabled).onChange(async (v) => {
         s.scheduleEnabled = v;
         await this.plugin.saveSettings();
         this.plugin.reschedule();
       })
     );
-    new import_obsidian2.Setting(containerEl).setName("Schedule time").setDesc("Local 24h time, e.g. 21:00").addText(
-      (t) => t.setValue(s.scheduleTime).onChange(async (v) => {
+    new import_obsidian2.Setting(containerEl).setName(t(L, "scheduleTime")).setDesc(t(L, "scheduleTimeDesc")).addText(
+      (inp) => inp.setValue(s.scheduleTime).onChange(async (v) => {
         s.scheduleTime = v.trim();
         await this.plugin.saveSettings();
         this.plugin.reschedule();
       })
     );
-    containerEl.createEl("h3", { text: "Signal weights" });
-    this.weightSetting(containerEl, s, "stale", "Stale weight");
-    this.weightSetting(containerEl, s, "orphan", "Orphan weight");
-    this.weightSetting(containerEl, s, "duplicate", "Duplicate weight");
-    this.weightSetting(containerEl, s, "avoidance", "Avoidance weight");
+    new import_obsidian2.Setting(containerEl).setName(t(L, "scheduleAutoStart")).setDesc(t(L, "scheduleAutoStartDesc")).addToggle(
+      (tog) => tog.setValue(s.scheduleAutoStart).onChange(async (v) => {
+        s.scheduleAutoStart = v;
+        await this.plugin.saveSettings();
+      })
+    );
+    containerEl.createEl("h3", { text: t(L, "weightsHeading") });
+    this.weightSetting(containerEl, s, L, "stale", "weightStale");
+    this.weightSetting(containerEl, s, L, "orphan", "weightOrphan");
+    this.weightSetting(containerEl, s, L, "duplicate", "weightDuplicate");
+    this.weightSetting(containerEl, s, L, "avoidance", "weightAvoidance");
     containerEl.createEl("p", {
       cls: "pulse-muted",
-      text: `Streak: ${s.streakDays} day(s). Last session: ${s.lastSessionDate || "\u2014"}`
+      text: t(L, "streakLine", {
+        days: s.streakDays,
+        last: s.lastSessionDate || "\u2014"
+      })
     });
   }
-  weightSetting(containerEl, s, key, name) {
-    new import_obsidian2.Setting(containerEl).setName(name).addText(
-      (t) => t.setValue(String(s.weights[key])).onChange(async (v) => {
+  weightSetting(containerEl, s, locale, key, nameKey) {
+    new import_obsidian2.Setting(containerEl).setName(t(locale, nameKey)).addText(
+      (inp) => inp.setValue(String(s.weights[key])).onChange(async (v) => {
         const n = Number(v);
         if (!Number.isNaN(n) && n >= 0) {
           s.weights[key] = n;
@@ -510,6 +684,7 @@ var PulseSettingTab = class extends import_obsidian2.PluginSettingTab {
 
 // src/types.ts
 var DEFAULT_SETTINGS = {
+  locale: "en",
   staleDays: 90,
   sessionMinutes: 20,
   sessionTargetCount: "auto",
@@ -518,6 +693,7 @@ var DEFAULT_SETTINGS = {
   snoozeDays: 7,
   scheduleEnabled: false,
   scheduleTime: "21:00",
+  scheduleAutoStart: true,
   weights: {
     stale: 1,
     orphan: 1,
@@ -541,6 +717,7 @@ var SessionModal = class extends import_obsidian3.Modal {
     this.closed = false;
     this.queue = queue;
     this.handlers = handlers;
+    this.locale = handlers.locale;
     this.remainingSec = Math.max(60, handlers.minutes * 60);
     this.stats = {
       opened: 0,
@@ -552,24 +729,25 @@ var SessionModal = class extends import_obsidian3.Modal {
   }
   onOpen() {
     const { contentEl } = this;
+    const L = this.locale;
     contentEl.empty();
     contentEl.addClass("pulse-session-modal");
-    contentEl.createEl("h2", { text: "Vault Pulse session" });
+    contentEl.createEl("h2", { text: t(L, "sessionTitle") });
     this.timerEl = contentEl.createDiv({ cls: "pulse-timer" });
     this.statusEl = contentEl.createDiv({ cls: "pulse-status" });
     this.cardEl = contentEl.createDiv({ cls: "pulse-card" });
     const actions = contentEl.createDiv({ cls: "pulse-actions" });
     new import_obsidian3.Setting(actions).addButton(
-      (b) => b.setButtonText("Open").setCta().onClick(() => void this.act("open"))
+      (b) => b.setButtonText(t(L, "open")).setCta().onClick(() => void this.act("open"))
     ).addButton(
-      (b) => b.setButtonText("Archive").onClick(() => void this.act("archive"))
+      (b) => b.setButtonText(t(L, "archive")).onClick(() => void this.act("archive"))
     ).addButton(
-      (b) => b.setButtonText("Snooze").onClick(() => void this.act("snooze"))
+      (b) => b.setButtonText(t(L, "snooze")).onClick(() => void this.act("snooze"))
     ).addButton(
-      (b) => b.setButtonText("Skip").onClick(() => void this.act("skip"))
+      (b) => b.setButtonText(t(L, "skip")).onClick(() => void this.act("skip"))
     );
     new import_obsidian3.Setting(contentEl).addButton(
-      (b) => b.setButtonText("End session").onClick(() => this.finish(false))
+      (b) => b.setButtonText(t(L, "endSession")).onClick(() => this.finish(false))
     );
     this.renderCard();
     this.tickTimer();
@@ -590,20 +768,23 @@ var SessionModal = class extends import_obsidian3.Modal {
     const m = Math.floor(this.remainingSec / 60);
     const s = this.remainingSec % 60;
     this.timerEl.setText(
-      `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} remaining`
+      `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} ${t(this.locale, "remaining")}`
     );
     this.remainingSec -= 1;
   }
   renderCard() {
+    const L = this.locale;
     const done = this.stats.opened + this.stats.archived + this.stats.snoozed + this.stats.skipped;
     this.statusEl.setText(
-      `Card ${Math.min(this.index + 1, this.queue.length)} / ${this.queue.length} \xB7 processed ${done}`
+      t(L, "cardProgress", {
+        current: Math.min(this.index + 1, this.queue.length),
+        total: this.queue.length,
+        done
+      })
     );
     this.cardEl.empty();
     if (this.index >= this.queue.length) {
-      this.cardEl.createEl("p", {
-        text: "Queue complete. Great work \u2014 end session or wait for the timer."
-      });
+      this.cardEl.createEl("p", { text: t(L, "queueComplete") });
       return;
     }
     const note = this.queue[this.index];
@@ -621,7 +802,7 @@ var SessionModal = class extends import_obsidian3.Modal {
       await this.handlers.onAction(note, action);
     } catch (e) {
       console.error(e);
-      new import_obsidian3.Notice("Pulse action failed. See console.");
+      new import_obsidian3.Notice(t(this.locale, "actionFailed"));
       return;
     }
     if (action === "open") this.stats.opened += 1;
@@ -644,7 +825,7 @@ var SessionModal = class extends import_obsidian3.Modal {
     this.closed = true;
     if (this.timerId != null) window.clearInterval(this.timerId);
     this.handlers.onComplete(this.stats, this.isSuccess());
-    if (auto) new import_obsidian3.Notice("Pulse session time is up.");
+    if (auto) new import_obsidian3.Notice(t(this.locale, "timeUp"));
     this.close();
   }
 };
@@ -656,6 +837,7 @@ var PulseView = class extends import_obsidian4.ItemView {
   constructor(leaf) {
     super(leaf);
     this.queue = [];
+    this.locale = "en";
     this.onStart = null;
     this.onRefresh = null;
   }
@@ -672,6 +854,10 @@ var PulseView = class extends import_obsidian4.ItemView {
     this.onStart = opts.onStart;
     this.onRefresh = opts.onRefresh;
   }
+  setLocale(locale) {
+    this.locale = locale;
+    this.render();
+  }
   setQueue(queue) {
     this.queue = queue;
     this.render();
@@ -680,27 +866,30 @@ var PulseView = class extends import_obsidian4.ItemView {
     this.render();
   }
   render() {
+    const L = this.locale;
     const root = this.contentEl;
     root.empty();
     root.addClass("pulse-view");
-    root.createEl("h2", { text: "Vault Pulse" });
+    root.createEl("h2", { text: t(L, "pluginName") });
     root.createEl("p", {
       cls: "pulse-muted",
-      text: "Local radar for notes worth triaging. No AI. No network."
+      text: t(L, "viewSubtitle")
     });
     const toolbar = root.createDiv({ cls: "pulse-toolbar" });
     const startBtn = toolbar.createEl("button", {
-      text: "Start session",
+      text: t(L, "startSession"),
       cls: "mod-cta"
     });
     startBtn.onclick = () => this.onStart?.();
-    const refreshBtn = toolbar.createEl("button", { text: "Rebuild queue" });
+    const refreshBtn = toolbar.createEl("button", {
+      text: t(L, "rebuildQueue")
+    });
     refreshBtn.onclick = () => void this.onRefresh?.();
-    root.createEl("h3", { text: `Today\u2019s queue (${this.queue.length})` });
+    root.createEl("h3", {
+      text: `${t(L, "todayQueue")} (${this.queue.length})`
+    });
     if (this.queue.length === 0) {
-      root.createEl("p", {
-        text: "No signals right now. Rescan after more notes age, or lower Stale days in settings."
-      });
+      root.createEl("p", { text: t(L, "emptyQueue") });
       return;
     }
     const list = root.createEl("ul", { cls: "pulse-queue-list" });
@@ -711,7 +900,7 @@ var PulseView = class extends import_obsidian4.ItemView {
       li.createEl("div", { cls: "pulse-q-explain", text: n.explain });
       li.createEl("div", {
         cls: "pulse-q-score",
-        text: `score ${n.score.toFixed(1)}`
+        text: `${t(L, "score")} ${n.score.toFixed(1)}`
       });
     }
   }
@@ -721,9 +910,15 @@ var PulseView = class extends import_obsidian4.ItemView {
 var VaultPulsePlugin = class extends import_obsidian5.Plugin {
   constructor() {
     super(...arguments);
-    this.settings = { ...DEFAULT_SETTINGS, weights: { ...DEFAULT_SETTINGS.weights }, snoozeUntil: {}, excludeFolders: [...DEFAULT_SETTINGS.excludeFolders] };
+    this.settings = {
+      ...DEFAULT_SETTINGS,
+      weights: { ...DEFAULT_SETTINGS.weights },
+      snoozeUntil: {},
+      excludeFolders: [...DEFAULT_SETTINGS.excludeFolders]
+    };
     this.scheduleTimer = null;
     this.cachedQueue = [];
+    this.sessionOpen = false;
   }
   async onload() {
     await this.loadSettings();
@@ -731,7 +926,10 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
       this.app,
       () => this.settings,
       async (data) => {
-        await this.saveData({ settings: this.settings, index: data });
+        await this.saveData({
+          settings: this.settings,
+          index: data
+        });
       },
       async () => {
         const raw = await this.loadData();
@@ -741,6 +939,7 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
     await this.index.init();
     this.registerView(PULSE_VIEW_TYPE, (leaf) => {
       const view = new PulseView(leaf);
+      view.setLocale(this.settings.locale);
       view.setHandlers({
         onStart: () => void this.startSession(),
         onRefresh: async () => {
@@ -755,17 +954,17 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
     });
     this.addCommand({
       id: "pulse-start-session",
-      name: "Start Pulse session",
+      name: t(this.settings.locale, "cmdStart"),
       callback: () => void this.startSession()
     });
     this.addCommand({
       id: "pulse-open-view",
-      name: "Open Pulse view",
+      name: t(this.settings.locale, "cmdOpenView"),
       callback: () => void this.activateView()
     });
     this.addCommand({
       id: "pulse-rescan",
-      name: "Rescan vault index",
+      name: t(this.settings.locale, "cmdRescan"),
       callback: () => void this.rescan()
     });
     this.addSettingTab(new PulseSettingTab(this.app, this));
@@ -775,7 +974,12 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
       this.refreshOpenViews();
       this.reschedule();
       if (shouldOfferCatchUpSession(this.settings)) {
-        new import_obsidian5.Notice("Vault Pulse: catch-up session available. Run \u201CStart Pulse session\u201D.");
+        if (this.settings.scheduleAutoStart) {
+          new import_obsidian5.Notice(t(this.settings.locale, "catchUp"));
+          window.setTimeout(() => void this.startSession(), 600);
+        } else {
+          new import_obsidian5.Notice(t(this.settings.locale, "catchUpManual"));
+        }
       }
     });
   }
@@ -794,6 +998,8 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
       this.settings = {
         ...DEFAULT_SETTINGS,
         ...raw.settings,
+        locale: raw.settings.locale === "ko" ? "ko" : "en",
+        scheduleAutoStart: raw.settings.scheduleAutoStart ?? DEFAULT_SETTINGS.scheduleAutoStart,
         weights: { ...DEFAULT_SETTINGS.weights, ...raw.settings.weights },
         excludeFolders: raw.settings.excludeFolders ?? [...DEFAULT_SETTINGS.excludeFolders],
         snoozeUntil: raw.settings.snoozeUntil ?? {}
@@ -807,36 +1013,59 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
       index: raw?.index ?? null
     });
   }
+  /** Called when language changes in settings */
+  onLocaleChange() {
+    void this.rebuildQueue(false).then(() => this.refreshOpenViews());
+  }
   reschedule() {
     if (this.scheduleTimer != null) {
       window.clearTimeout(this.scheduleTimer);
       this.scheduleTimer = null;
     }
+    if (!this.settings.scheduleEnabled) return;
     const ms = msUntilNextSchedule(this.settings);
     if (ms == null) return;
     this.scheduleTimer = window.setTimeout(() => {
-      new import_obsidian5.Notice("Vault Pulse: scheduled triage time.");
-      void this.startSession();
+      void this.onScheduledFire();
       this.reschedule();
     }, ms);
   }
+  async onScheduledFire() {
+    const L = this.settings.locale;
+    if (this.settings.lastSessionDate === todayKey() && this.settings.lastSessionCompleted) {
+      return;
+    }
+    new import_obsidian5.Notice(t(L, "scheduledTime"));
+    if (this.settings.scheduleAutoStart) {
+      await this.startSession();
+    }
+  }
   async rescan() {
-    new import_obsidian5.Notice("Vault Pulse: scanning vault\u2026");
+    const L = this.settings.locale;
+    new import_obsidian5.Notice(t(L, "scanning"));
     await this.index.fullRebuild();
     await this.rebuildQueue(false);
     this.refreshOpenViews();
-    new import_obsidian5.Notice("Vault Pulse: scan complete.");
+    new import_obsidian5.Notice(t(L, "scanComplete"));
   }
   async rebuildQueue(forceRescan) {
     if (forceRescan) await this.index.fullRebuild();
     else await this.index.ensureReady();
-    const scored = scoreNotes(this.index.entries, this.settings);
+    const scored = scoreNotes(
+      this.index.entries,
+      this.settings,
+      Date.now(),
+      this.settings.locale
+    );
     this.cachedQueue = buildTodayQueue(scored, this.settings);
   }
   refreshOpenViews() {
     for (const leaf of this.app.workspace.getLeavesOfType(PULSE_VIEW_TYPE)) {
       const v = leaf.view;
-      if (v instanceof PulseView) v.setQueue(this.cachedQueue);
+      if (v instanceof PulseView) {
+        v.setLocale(this.settings.locale);
+        v.setQueue(this.cachedQueue);
+      }
     }
   }
   async activateView() {
@@ -856,19 +1085,27 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
     }
   }
   async startSession() {
+    if (this.sessionOpen) return;
     await this.rebuildQueue(false);
+    const L = this.settings.locale;
     if (this.cachedQueue.length === 0) {
-      new import_obsidian5.Notice("Vault Pulse: nothing to triage right now.");
+      new import_obsidian5.Notice(t(L, "nothingToTriage"));
       return;
     }
     const queue = [...this.cachedQueue];
+    this.sessionOpen = true;
     new SessionModal(this.app, queue, {
       minutes: this.settings.sessionMinutes,
+      locale: this.settings.locale,
       onAction: (note, action) => this.handleAction(note, action),
-      onComplete: (stats, completed) => void this.finishSession(stats, completed)
+      onComplete: (stats, completed) => {
+        this.sessionOpen = false;
+        void this.finishSession(stats, completed);
+      }
     }).open();
   }
   async handleAction(note, action) {
+    const L = this.settings.locale;
     if (action === "open") {
       const file = this.app.vault.getAbstractFileByPath(note.path);
       if (file instanceof import_obsidian5.TFile) {
@@ -877,7 +1114,9 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
       return;
     }
     if (action === "snooze") {
-      this.settings.snoozeUntil[note.path] = addDaysIso(this.settings.snoozeDays);
+      this.settings.snoozeUntil[note.path] = addDaysIso(
+        this.settings.snoozeDays
+      );
       await this.saveSettings();
       return;
     }
@@ -895,7 +1134,7 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
         finalDest = `${folder}/${base}-${stamp}.md`;
       }
       await this.app.fileManager.renameFile(file, finalDest);
-      new import_obsidian5.Notice(`Archived \u2192 ${finalDest}`);
+      new import_obsidian5.Notice(t(L, "archived", { path: finalDest }));
     }
   }
   async ensureFolder(path) {
@@ -911,8 +1150,7 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
   async finishSession(stats, completed) {
     const today = todayKey();
     if (completed) {
-      if (this.settings.lastSessionDate === today) {
-      } else {
+      if (this.settings.lastSessionDate !== today) {
         const yesterday = /* @__PURE__ */ new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         if (this.settings.lastSessionDate === todayKey(yesterday)) {
@@ -929,7 +1167,15 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
     this.refreshOpenViews();
     const done = stats.opened + stats.archived + stats.snoozed + stats.skipped;
     new import_obsidian5.Notice(
-      `Pulse done: ${done}/${stats.target} \xB7 open ${stats.opened} \xB7 archive ${stats.archived} \xB7 snooze ${stats.snoozed} \xB7 skip ${stats.skipped} \xB7 streak ${this.settings.streakDays}`
+      t(this.settings.locale, "sessionDone", {
+        done,
+        target: stats.target,
+        opened: stats.opened,
+        archived: stats.archived,
+        snoozed: stats.snoozed,
+        skipped: stats.skipped,
+        streak: this.settings.streakDays
+      })
     );
   }
 };

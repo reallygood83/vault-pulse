@@ -1,9 +1,9 @@
 {
 	"id": "vault-pulse",
 	"name": "Vault Pulse",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"minAppVersion": "1.5.0",
-	"description": "Local radar for large vaults: score stale/orphan/duplicate notes and run a focused daily triage session. No AI or network required.",
+	"description": "Local vault radar + daily timed triage. Korean/English UI. Optional auto session at a set time. No AI.",
 	"author": "reallygood83",
 	"authorUrl": "https://github.com/reallygood83",
 	"isDesktopOnly": false

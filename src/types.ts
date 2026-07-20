@@ -5,15 +5,25 @@ export interface PulseWeights {
   avoidance: number;
 }
 
+import type { PulseLocale } from "./i18n";
+
+export type { PulseLocale };
+
 export interface PulseSettings {
+  /** UI language */
+  locale: PulseLocale;
   staleDays: number;
   sessionMinutes: number;
   sessionTargetCount: number | "auto";
   excludeFolders: string[];
   archiveFolder: string;
   snoozeDays: number;
+  /** When true, fire at scheduleTime each day (if Obsidian is open) */
   scheduleEnabled: boolean;
+  /** Local HH:mm */
   scheduleTime: string;
+  /** When true, open session modal at schedule; when false, notice only */
+  scheduleAutoStart: boolean;
   weights: PulseWeights;
   maxPerFolder: number;
   /** path -> ISO date until which note is snoozed */
@@ -68,6 +78,7 @@ export interface SessionStats {
 }
 
 export const DEFAULT_SETTINGS: PulseSettings = {
+  locale: "en",
   staleDays: 90,
   sessionMinutes: 20,
   sessionTargetCount: "auto",
@@ -76,6 +87,7 @@ export const DEFAULT_SETTINGS: PulseSettings = {
   snoozeDays: 7,
   scheduleEnabled: false,
   scheduleTime: "21:00",
+  scheduleAutoStart: true,
   weights: {
     stale: 1,
     orphan: 1,

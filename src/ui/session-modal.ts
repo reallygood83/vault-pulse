@@ -1,4 +1,5 @@
-import { App, Modal, Notice, Setting, TFile } from "obsidian";
+import { App, Modal, Notice, Setting } from "obsidian";
+import { t, type PulseLocale } from "../i18n";
 import type { ScoredNote, SessionStats } from "../types";
 
 export type SessionAction = "open" | "archive" | "snooze" | "skip";
@@ -7,6 +8,7 @@ export interface SessionModalHandlers {
   onAction: (note: ScoredNote, action: SessionAction) => Promise<void>;
   onComplete: (stats: SessionStats, completed: boolean) => void;
   minutes: number;
+  locale: PulseLocale;
 }
 
 export class SessionModal extends Modal {
@@ -16,6 +18,7 @@ export class SessionModal extends Modal {
   private timerId: number | null = null;
   private stats: SessionStats;
   private handlers: SessionModalHandlers;
+  private locale: PulseLocale;
   private statusEl!: HTMLElement;
   private cardEl!: HTMLElement;
   private timerEl!: HTMLElement;
@@ -29,6 +32,7 @@ export class SessionModal extends Modal {
     super(app);
     this.queue = queue;
     this.handlers = handlers;
+    this.locale = handlers.locale;
     this.remainingSec = Math.max(60, handlers.minutes * 60);
     this.stats = {
       opened: 0,
@@ -41,10 +45,11 @@ export class SessionModal extends Modal {
 
   onOpen(): void {
     const { contentEl } = this;
+    const L = this.locale;
     contentEl.empty();
     contentEl.addClass("pulse-session-modal");
 
-    contentEl.createEl("h2", { text: "Vault Pulse session" });
+    contentEl.createEl("h2", { text: t(L, "sessionTitle") });
     this.timerEl = contentEl.createDiv({ cls: "pulse-timer" });
     this.statusEl = contentEl.createDiv({ cls: "pulse-status" });
     this.cardEl = contentEl.createDiv({ cls: "pulse-card" });
@@ -52,20 +57,27 @@ export class SessionModal extends Modal {
     const actions = contentEl.createDiv({ cls: "pulse-actions" });
     new Setting(actions)
       .addButton((b) =>
-        b.setButtonText("Open").setCta().onClick(() => void this.act("open"))
+        b
+          .setButtonText(t(L, "open"))
+          .setCta()
+          .onClick(() => void this.act("open"))
       )
       .addButton((b) =>
-        b.setButtonText("Archive").onClick(() => void this.act("archive"))
+        b
+          .setButtonText(t(L, "archive"))
+          .onClick(() => void this.act("archive"))
       )
       .addButton((b) =>
-        b.setButtonText("Snooze").onClick(() => void this.act("snooze"))
+        b.setButtonText(t(L, "snooze")).onClick(() => void this.act("snooze"))
       )
       .addButton((b) =>
-        b.setButtonText("Skip").onClick(() => void this.act("skip"))
+        b.setButtonText(t(L, "skip")).onClick(() => void this.act("skip"))
       );
 
     new Setting(contentEl).addButton((b) =>
-      b.setButtonText("End session").onClick(() => this.finish(false))
+      b
+        .setButtonText(t(L, "endSession"))
+        .onClick(() => this.finish(false))
     );
 
     this.renderCard();
@@ -89,26 +101,29 @@ export class SessionModal extends Modal {
     const m = Math.floor(this.remainingSec / 60);
     const s = this.remainingSec % 60;
     this.timerEl.setText(
-      `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} remaining`
+      `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} ${t(this.locale, "remaining")}`
     );
     this.remainingSec -= 1;
   }
 
   private renderCard(): void {
+    const L = this.locale;
     const done =
       this.stats.opened +
       this.stats.archived +
       this.stats.snoozed +
       this.stats.skipped;
     this.statusEl.setText(
-      `Card ${Math.min(this.index + 1, this.queue.length)} / ${this.queue.length} · processed ${done}`
+      t(L, "cardProgress", {
+        current: Math.min(this.index + 1, this.queue.length),
+        total: this.queue.length,
+        done,
+      })
     );
 
     this.cardEl.empty();
     if (this.index >= this.queue.length) {
-      this.cardEl.createEl("p", {
-        text: "Queue complete. Great work — end session or wait for the timer.",
-      });
+      this.cardEl.createEl("p", { text: t(L, "queueComplete") });
       return;
     }
     const note = this.queue[this.index];
@@ -127,7 +142,7 @@ export class SessionModal extends Modal {
       await this.handlers.onAction(note, action);
     } catch (e) {
       console.error(e);
-      new Notice("Pulse action failed. See console.");
+      new Notice(t(this.locale, "actionFailed"));
       return;
     }
     if (action === "open") this.stats.opened += 1;
@@ -157,7 +172,7 @@ export class SessionModal extends Modal {
     this.closed = true;
     if (this.timerId != null) window.clearInterval(this.timerId);
     this.handlers.onComplete(this.stats, this.isSuccess());
-    if (auto) new Notice("Pulse session time is up.");
+    if (auto) new Notice(t(this.locale, "timeUp"));
     this.close();
   }
 }
