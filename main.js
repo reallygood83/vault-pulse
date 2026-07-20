@@ -287,6 +287,7 @@ var en = {
   obsigravityMissing: "Obsigravity is not installed. Install BRAT, then add reallygood83/obsigravity. Opening the note only.",
   obsigravitySoftHandoff: "Opened note + Obsigravity. Run /note-surgeon with your request if auto-start did not fire.",
   obsigravityUpdateFailed: "Obsigravity update failed. The note was opened so you can retry from Obsigravity (/note-surgeon).",
+  obsigravityStarted: "Obsigravity Note Surgeon started for this note. Watch the Obsigravity panel.",
   next: "Next card",
   nextTooltip: "Done with this note for now \u2014 go to the next card (does not archive).",
   archive: "Archive",
@@ -318,8 +319,8 @@ var en = {
   staleDaysDesc: "Notes not modified for at least this many days can be flagged stale.",
   sessionMinutes: "Session minutes",
   sessionMinutesDesc: "Default focus session length (habit timebox).",
-  sessionTarget: "Session target count",
-  sessionTargetDesc: 'Number of cards per session, or "auto" (~minutes/1.5, clamped 5\u201320).',
+  sessionTarget: "Notes per day (session / queue size)",
+  sessionTargetDesc: 'How many notes to queue each day. Use a number 1\u2013100, or "auto" (~session minutes \xF7 1.5, max 30). Rebuild queue after changing.',
   excludeFolders: "Exclude folders",
   excludeFoldersDesc: "Comma-separated folder prefixes to ignore (e.g. Archive, Templates).",
   archiveFolder: "Archive folder",
@@ -385,6 +386,7 @@ var ko = {
   obsigravityMissing: "Obsigravity\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4. BRAT \uC124\uCE58 \uD6C4 reallygood83/obsigravity \uB97C \uCD94\uAC00\uD558\uC138\uC694. \uB178\uD2B8\uB9CC \uC5FD\uB2C8\uB2E4.",
   obsigravitySoftHandoff: "\uB178\uD2B8\uC640 Obsigravity\uB97C \uC5F4\uC5C8\uC2B5\uB2C8\uB2E4. \uC790\uB3D9 \uC2E4\uD589\uC774 \uC548 \uB418\uBA74 /note-surgeon \uC73C\uB85C \uC694\uCCAD\uC744 \uBCF4\uB0B4\uC138\uC694.",
   obsigravityUpdateFailed: "Obsigravity \uC5C5\uB370\uC774\uD2B8\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uB178\uD2B8\uB97C \uC5F4\uC5C8\uC73C\uB2C8 Obsigravity\uC5D0\uC11C /note-surgeon \uC73C\uB85C \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uBCF4\uC138\uC694.",
+  obsigravityStarted: "\uC774 \uB178\uD2B8\uC5D0 \uB300\uD574 Obsigravity Note Surgeon\uC744 \uC2DC\uC791\uD588\uC2B5\uB2C8\uB2E4. \uC624\uB978\uCABD Obsigravity \uD328\uB110\uC744 \uD655\uC778\uD558\uC138\uC694.",
   next: "\uB2E4\uC74C \uCE74\uB4DC",
   nextTooltip: "\uC774 \uB178\uD2B8\uB294 \uC77C\uB2E8 \uB05D \u2014 \uB2E4\uC74C \uCE74\uB4DC\uB85C (\uBCF4\uAD00\uD558\uC9C0 \uC54A\uC74C).",
   archive: "\uBCF4\uAD00",
@@ -416,8 +418,8 @@ var ko = {
   staleDaysDesc: "\uC774 \uC77C\uC218 \uC774\uC0C1 \uC218\uC815\uD558\uC9C0 \uC54A\uC740 \uB178\uD2B8\uB97C \u2018\uC624\uB798\uB428(Stale)\u2019\uC73C\uB85C \uBCFC \uC218 \uC788\uC2B5\uB2C8\uB2E4.",
   sessionMinutes: "\uC138\uC158 \uC2DC\uAC04(\uBD84)",
   sessionMinutesDesc: "\uD55C \uBC88 \uC9D1\uC911 \uC138\uC158 \uAE38\uC774(\uC2B5\uAD00\uC6A9 \uD0C0\uC774\uBA38).",
-  sessionTarget: "\uC138\uC158 \uCE74\uB4DC \uC218",
-  sessionTargetDesc: '\uC138\uC158\uB2F9 \uCE74\uB4DC \uAC1C\uC218. "auto"\uBA74 \uB300\uB7B5 \uBD84\xF71.5 (5~20\uAC1C\uB85C \uC81C\uD55C).',
+  sessionTarget: "\uD558\uB8E8 \uCC98\uB9AC \uB178\uD2B8 \uAC1C\uC218 (\uD050/\uC138\uC158)",
+  sessionTargetDesc: '\uC624\uB298 \uD050\uC5D0 \uC62C\uB9B4 \uB178\uD2B8 \uC218. \uC22B\uC790 1\u2013100, \uB610\uB294 "auto"(\uC138\uC158 \uBD84\xF71.5, \uCD5C\uB300 30). \uBC14\uAFBC \uB4A4 \u300C\uD050 \uB2E4\uC2DC \uB9CC\uB4E4\uAE30\u300D\uB97C \uB204\uB974\uC138\uC694.',
   excludeFolders: "\uC81C\uC678 \uD3F4\uB354",
   excludeFoldersDesc: "\uBB34\uC2DC\uD560 \uD3F4\uB354 \uC811\uB450\uC0AC(\uC27C\uD45C\uB85C \uAD6C\uBD84). \uC608: Archive, Templates",
   archiveFolder: "\uBCF4\uAD00 \uD3F4\uB354",
@@ -555,9 +557,9 @@ function buildExplain(signals, daysStale, inLinks, path, locale) {
 // src/engine/queue.ts
 function targetCount(settings) {
   if (settings.sessionTargetCount === "auto") {
-    return Math.min(20, Math.max(5, Math.floor(settings.sessionMinutes / 1.5)));
+    return Math.min(30, Math.max(5, Math.floor(settings.sessionMinutes / 1.5)));
   }
-  return Math.min(20, Math.max(1, settings.sessionTargetCount));
+  return Math.min(100, Math.max(1, settings.sessionTargetCount));
 }
 function buildTodayQueue(scored, settings) {
   const limit = targetCount(settings);
@@ -717,17 +719,21 @@ var PulseSettingTab = class extends import_obsidian2.PluginSettingTab {
       })
     );
     new import_obsidian2.Setting(containerEl).setName(t(L, "sessionTarget")).setDesc(t(L, "sessionTargetDesc")).addText(
-      (inp) => inp.setValue(
+      (inp) => inp.setPlaceholder("auto \uB610\uB294 1\u2013100").setValue(
         s.sessionTargetCount === "auto" ? "auto" : String(s.sessionTargetCount)
       ).onChange(async (v) => {
-        if (v.trim().toLowerCase() === "auto") {
+        const raw = v.trim().toLowerCase();
+        if (raw === "auto" || raw === "") {
           s.sessionTargetCount = "auto";
         } else {
-          const n = Number(v);
-          if (!Number.isNaN(n) && n > 0)
-            s.sessionTargetCount = Math.floor(n);
+          const n = Number(raw);
+          if (!Number.isNaN(n) && n > 0) {
+            s.sessionTargetCount = Math.min(100, Math.max(1, Math.floor(n)));
+          }
         }
         await this.plugin.saveSettings();
+        await this.plugin.rebuildQueue(false);
+        this.plugin.refreshOpenViewsPublic();
       })
     );
     new import_obsidian2.Setting(containerEl).setName(t(L, "excludeFolders")).setDesc(t(L, "excludeFoldersDesc")).addText(
@@ -1180,16 +1186,17 @@ async function runInfoUpdate(app, locale, notePath, userPrompt) {
     }
     return;
   }
+  const target = app.vault.getAbstractFileByPath(notePath);
+  if (target instanceof import_obsidian6.TFile) {
+    await app.workspace.getLeaf(false).openFile(target, { active: true });
+  }
   if (typeof og.startNoteUpdateFromPulse === "function") {
     try {
       await og.startNoteUpdateFromPulse(notePath, userPrompt);
+      new import_obsidian6.Notice(t(locale, "obsigravityStarted"), 6e3);
     } catch (e) {
       console.error("[Vault Pulse] Obsigravity update failed", e);
       new import_obsidian6.Notice(t(locale, "obsigravityUpdateFailed"), 8e3);
-      const file = app.vault.getAbstractFileByPath(notePath);
-      if (file instanceof import_obsidian6.TFile) {
-        await app.workspace.getLeaf(false).openFile(file);
-      }
     }
     return;
   }
@@ -1398,6 +1405,10 @@ var VaultPulsePlugin = class extends import_obsidian7.Plugin {
       this.settings.locale
     );
     this.cachedQueue = buildTodayQueue(scored, this.settings);
+  }
+  /** Used by settings tab after changing daily note count */
+  refreshOpenViewsPublic() {
+    this.refreshOpenViews();
   }
   refreshOpenViews() {
     for (const leaf of this.app.workspace.getLeavesOfType(PULSE_VIEW_TYPE)) {

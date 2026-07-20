@@ -1,11 +1,12 @@
 import type { PulseSettings, ScoredNote } from "../types";
 import { parentFolder } from "../utils/text";
 
+/** Daily queue / session card count. auto ≈ minutes/1.5 (5–30). Custom: 1–100. */
 export function targetCount(settings: PulseSettings): number {
   if (settings.sessionTargetCount === "auto") {
-    return Math.min(20, Math.max(5, Math.floor(settings.sessionMinutes / 1.5)));
+    return Math.min(30, Math.max(5, Math.floor(settings.sessionMinutes / 1.5)));
   }
-  return Math.min(20, Math.max(1, settings.sessionTargetCount));
+  return Math.min(100, Math.max(1, settings.sessionTargetCount));
 }
 
 /**

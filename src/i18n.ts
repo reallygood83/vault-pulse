@@ -42,6 +42,8 @@ const en: Dict = {
     "Opened note + Obsigravity. Run /note-surgeon with your request if auto-start did not fire.",
   obsigravityUpdateFailed:
     "Obsigravity update failed. The note was opened so you can retry from Obsigravity (/note-surgeon).",
+  obsigravityStarted:
+    "Obsigravity Note Surgeon started for this note. Watch the Obsigravity panel.",
   next: "Next card",
   nextTooltip: "Done with this note for now — go to the next card (does not archive).",
   archive: "Archive",
@@ -78,9 +80,9 @@ const en: Dict = {
     "Notes not modified for at least this many days can be flagged stale.",
   sessionMinutes: "Session minutes",
   sessionMinutesDesc: "Default focus session length (habit timebox).",
-  sessionTarget: "Session target count",
+  sessionTarget: "Notes per day (session / queue size)",
   sessionTargetDesc:
-    'Number of cards per session, or "auto" (~minutes/1.5, clamped 5–20).',
+    'How many notes to queue each day. Use a number 1–100, or "auto" (~session minutes ÷ 1.5, max 30). Rebuild queue after changing.',
   excludeFolders: "Exclude folders",
   excludeFoldersDesc:
     "Comma-separated folder prefixes to ignore (e.g. Archive, Templates).",
@@ -161,6 +163,8 @@ const ko: Dict = {
     "노트와 Obsigravity를 열었습니다. 자동 실행이 안 되면 /note-surgeon 으로 요청을 보내세요.",
   obsigravityUpdateFailed:
     "Obsigravity 업데이트에 실패했습니다. 노트를 열었으니 Obsigravity에서 /note-surgeon 으로 다시 시도해 보세요.",
+  obsigravityStarted:
+    "이 노트에 대해 Obsigravity Note Surgeon을 시작했습니다. 오른쪽 Obsigravity 패널을 확인하세요.",
   next: "다음 카드",
   nextTooltip: "이 노트는 일단 끝 — 다음 카드로 (보관하지 않음).",
   archive: "보관",
@@ -198,9 +202,9 @@ const ko: Dict = {
     "이 일수 이상 수정하지 않은 노트를 ‘오래됨(Stale)’으로 볼 수 있습니다.",
   sessionMinutes: "세션 시간(분)",
   sessionMinutesDesc: "한 번 집중 세션 길이(습관용 타이머).",
-  sessionTarget: "세션 카드 수",
+  sessionTarget: "하루 처리 노트 개수 (큐/세션)",
   sessionTargetDesc:
-    '세션당 카드 개수. "auto"면 대략 분÷1.5 (5~20개로 제한).',
+    '오늘 큐에 올릴 노트 수. 숫자 1–100, 또는 "auto"(세션 분÷1.5, 최대 30). 바꾼 뒤 「큐 다시 만들기」를 누르세요.',
   excludeFolders: "제외 폴더",
   excludeFoldersDesc:
     "무시할 폴더 접두사(쉼표로 구분). 예: Archive, Templates",

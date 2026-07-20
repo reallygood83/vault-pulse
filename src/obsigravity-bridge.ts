@@ -61,17 +61,19 @@ export async function runInfoUpdate(
     return;
   }
 
+  // Always open the exact path first so the editor leaf matches Pulse context
+  const target = app.vault.getAbstractFileByPath(notePath);
+  if (target instanceof TFile) {
+    await app.workspace.getLeaf(false).openFile(target, { active: true });
+  }
+
   if (typeof og.startNoteUpdateFromPulse === "function") {
     try {
       await og.startNoteUpdateFromPulse(notePath, userPrompt);
+      new Notice(t(locale, "obsigravityStarted"), 6000);
     } catch (e) {
       console.error("[Vault Pulse] Obsigravity update failed", e);
       new Notice(t(locale, "obsigravityUpdateFailed"), 8000);
-      // Still open the note so the user can retry manually
-      const file = app.vault.getAbstractFileByPath(notePath);
-      if (file instanceof TFile) {
-        await app.workspace.getLeaf(false).openFile(file);
-      }
     }
     return;
   }

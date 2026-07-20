@@ -238,6 +238,11 @@ export default class VaultPulsePlugin extends Plugin {
     this.cachedQueue = buildTodayQueue(scored, this.settings);
   }
 
+  /** Used by settings tab after changing daily note count */
+  refreshOpenViewsPublic(): void {
+    this.refreshOpenViews();
+  }
+
   private refreshOpenViews(): void {
     for (const leaf of this.app.workspace.getLeavesOfType(PULSE_VIEW_TYPE)) {
       const v = leaf.view;

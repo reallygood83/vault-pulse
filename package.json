@@ -1,6 +1,6 @@
 {
   "name": "vault-pulse",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Local vault radar + daily timed triage for Obsidian. Korean/English UI. No AI.",
   "main": "main.js",
   "scripts": {

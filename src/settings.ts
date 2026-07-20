@@ -73,20 +73,26 @@ export class PulseSettingTab extends PluginSettingTab {
       .setDesc(t(L, "sessionTargetDesc"))
       .addText((inp) =>
         inp
+          .setPlaceholder("auto 또는 1–100")
           .setValue(
             s.sessionTargetCount === "auto"
               ? "auto"
               : String(s.sessionTargetCount)
           )
           .onChange(async (v) => {
-            if (v.trim().toLowerCase() === "auto") {
+            const raw = v.trim().toLowerCase();
+            if (raw === "auto" || raw === "") {
               s.sessionTargetCount = "auto";
             } else {
-              const n = Number(v);
-              if (!Number.isNaN(n) && n > 0)
-                s.sessionTargetCount = Math.floor(n);
+              const n = Number(raw);
+              if (!Number.isNaN(n) && n > 0) {
+                s.sessionTargetCount = Math.min(100, Math.max(1, Math.floor(n)));
+              }
             }
             await this.plugin.saveSettings();
+            // Refresh queue size so user sees the new count immediately
+            await this.plugin.rebuildQueue(false);
+            this.plugin.refreshOpenViewsPublic();
           })
       );
 
