@@ -11,6 +11,7 @@ import {
   msUntilNextSchedule,
   shouldOfferCatchUpSession,
 } from "./session/schedule";
+import { ActiveSession } from "./session/active-session";
 import { PulseSettingTab } from "./settings";
 import { t } from "./i18n";
 import {
@@ -40,7 +41,11 @@ export default class VaultPulsePlugin extends Plugin {
   private index!: VaultIndex;
   private scheduleTimer: number | null = null;
   private cachedQueue: ScoredNote[] = [];
-  private sessionOpen = false;
+  /** Live session (survives modal close) */
+  private active: ActiveSession | null = null;
+  private modal: SessionModal | null = null;
+  private statusEl: HTMLElement | null = null;
+  private statusTimer: number | null = null;
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -75,13 +80,27 @@ export default class VaultPulsePlugin extends Plugin {
     });
 
     this.addRibbonIcon("activity", "Vault Pulse", () => {
-      void this.activateView();
+      if (this.active && !this.active.ended) {
+        this.resumeSession();
+      } else {
+        void this.activateView();
+      }
     });
 
     this.addCommand({
       id: "pulse-start-session",
       name: t(this.settings.locale, "cmdStart"),
       callback: () => void this.startSession(),
+    });
+
+    this.addCommand({
+      id: "pulse-resume-session",
+      name: t(this.settings.locale, "cmdResume"),
+      checkCallback: (checking) => {
+        const ok = !!(this.active && !this.active.ended);
+        if (ok && !checking) this.resumeSession();
+        return ok;
+      },
     });
 
     this.addCommand({
@@ -98,6 +117,11 @@ export default class VaultPulsePlugin extends Plugin {
 
     this.addSettingTab(new PulseSettingTab(this.app, this));
 
+    this.statusEl = this.addStatusBarItem();
+    this.statusEl.addClass("pulse-status-bar");
+    this.statusEl.hide();
+    this.statusEl.onclick = () => this.resumeSession();
+
     void this.app.workspace.onLayoutReady(async () => {
       await this.index.ensureReady();
       await this.rebuildQueue(false);
@@ -107,7 +131,6 @@ export default class VaultPulsePlugin extends Plugin {
       if (shouldOfferCatchUpSession(this.settings)) {
         if (this.settings.scheduleAutoStart) {
           new Notice(t(this.settings.locale, "catchUp"));
-          // slight delay so UI is ready
           window.setTimeout(() => void this.startSession(), 600);
         } else {
           new Notice(t(this.settings.locale, "catchUpManual"));
@@ -121,6 +144,12 @@ export default class VaultPulsePlugin extends Plugin {
       window.clearTimeout(this.scheduleTimer);
       this.scheduleTimer = null;
     }
+    this.clearStatusBar();
+    if (this.active) {
+      this.active.end();
+      this.active = null;
+    }
+    this.modal = null;
     for (const leaf of this.app.workspace.getLeavesOfType(PULSE_VIEW_TYPE)) {
       leaf.detach();
     }
@@ -151,7 +180,6 @@ export default class VaultPulsePlugin extends Plugin {
     } satisfies PluginData);
   }
 
-  /** Called when language changes in settings */
   onLocaleChange(): void {
     void this.rebuildQueue(false).then(() => this.refreshOpenViews());
   }
@@ -162,10 +190,8 @@ export default class VaultPulsePlugin extends Plugin {
       this.scheduleTimer = null;
     }
     if (!this.settings.scheduleEnabled) return;
-
     const ms = msUntilNextSchedule(this.settings);
     if (ms == null) return;
-
     this.scheduleTimer = window.setTimeout(() => {
       void this.onScheduledFire();
       this.reschedule();
@@ -174,7 +200,6 @@ export default class VaultPulsePlugin extends Plugin {
 
   private async onScheduledFire(): Promise<void> {
     const L = this.settings.locale;
-    // Skip if already completed today's session successfully
     if (
       this.settings.lastSessionDate === todayKey() &&
       this.settings.lastSessionCompleted
@@ -236,24 +261,116 @@ export default class VaultPulsePlugin extends Plugin {
   }
 
   async startSession(): Promise<void> {
-    if (this.sessionOpen) return;
+    // Resume if already active
+    if (this.active && !this.active.ended) {
+      this.resumeSession();
+      return;
+    }
     await this.rebuildQueue(false);
     const L = this.settings.locale;
     if (this.cachedQueue.length === 0) {
       new Notice(t(L, "nothingToTriage"));
       return;
     }
-    const queue = [...this.cachedQueue];
-    this.sessionOpen = true;
-    new SessionModal(this.app, queue, {
-      minutes: this.settings.sessionMinutes,
+    this.active = new ActiveSession(
+      [...this.cachedQueue],
+      this.settings.sessionMinutes
+    );
+    this.showStatusBar();
+    this.openSessionModal();
+  }
+
+  resumeSession(): void {
+    if (!this.active || this.active.ended) {
+      void this.startSession();
+      return;
+    }
+    this.active.paused = false;
+    this.showStatusBar();
+    this.openSessionModal();
+  }
+
+  private openSessionModal(): void {
+    if (!this.active || this.active.ended) return;
+    // Avoid stacking modals
+    if (this.modal) {
+      try {
+        this.modal.close();
+      } catch {
+        /* ignore */
+      }
+      this.modal = null;
+    }
+    const session = this.active;
+    const modal = new SessionModal(this.app, {
       locale: this.settings.locale,
+      session,
       onAction: (note, action) => this.handleAction(note, action),
-      onComplete: (stats, completed) => {
-        this.sessionOpen = false;
-        void this.finishSession(stats, completed);
-      },
-    }).open();
+      onPause: () => this.onSessionPaused(),
+      onRequestEnd: (auto) => this.endActiveSession(auto),
+    });
+    this.modal = modal;
+    modal.open();
+  }
+
+  private onSessionPaused(): void {
+    if (!this.active || this.active.ended) return;
+    this.active.paused = true;
+    this.modal = null;
+    this.showStatusBar();
+    const time = this.formatTime(this.active.remainingSec);
+    new Notice(t(this.settings.locale, "sessionPaused", { time }));
+  }
+
+  private endActiveSession(auto: boolean): void {
+    if (!this.active) return;
+    const stats = { ...this.active.stats };
+    const completed = this.active.isSuccess();
+    this.active.end();
+    this.active = null;
+    this.modal = null;
+    this.clearStatusBar();
+    if (auto) new Notice(t(this.settings.locale, "timeUp"));
+    void this.finishSession(stats, completed);
+  }
+
+  private formatTime(sec: number): string {
+    const m = Math.floor(Math.max(0, sec) / 60);
+    const s = Math.max(0, sec) % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+
+  private showStatusBar(): void {
+    if (!this.statusEl || !this.active) return;
+    this.statusEl.show();
+    this.updateStatusBar();
+    if (this.statusTimer != null) window.clearInterval(this.statusTimer);
+    this.statusTimer = window.setInterval(() => this.updateStatusBar(), 1000);
+  }
+
+  private updateStatusBar(): void {
+    if (!this.statusEl || !this.active || this.active.ended) {
+      this.clearStatusBar();
+      return;
+    }
+    const time = this.formatTime(this.active.remainingSec);
+    const key = this.active.paused ? "statusBarPaused" : "statusBarActive";
+    this.statusEl.setText(t(this.settings.locale, key, { time }));
+    this.statusEl.setAttr(
+      "aria-label",
+      t(this.settings.locale, "cmdResume")
+    );
+  }
+
+  private clearStatusBar(): void {
+    if (this.statusTimer != null) {
+      window.clearInterval(this.statusTimer);
+      this.statusTimer = null;
+    }
+    if (this.statusEl) {
+      this.statusEl.setText("");
+      this.statusEl.hide();
+    }
   }
 
   private async handleAction(
@@ -261,13 +378,23 @@ export default class VaultPulsePlugin extends Plugin {
     action: SessionAction
   ): Promise<void> {
     const L = this.settings.locale;
+    if (!this.active) return;
+
     if (action === "open") {
       const file = this.app.vault.getAbstractFileByPath(note.path);
       if (file instanceof TFile) {
         await this.app.workspace.getLeaf(false).openFile(file);
       }
+      this.active.markOpened();
+      // Modal will pause itself after open
       return;
     }
+
+    if (action === "next") {
+      // just advance — already handled in modal via advanceAfterResolve
+      return;
+    }
+
     if (action === "snooze") {
       this.settings.snoozeUntil[note.path] = addDaysIso(
         this.settings.snoozeDays
@@ -276,6 +403,7 @@ export default class VaultPulsePlugin extends Plugin {
       return;
     }
     if (action === "skip") return;
+
     if (action === "archive") {
       const file = this.app.vault.getAbstractFileByPath(note.path);
       if (!(file instanceof TFile)) return;

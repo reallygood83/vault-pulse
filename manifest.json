@@ -1,9 +1,9 @@
 {
 	"id": "vault-pulse",
 	"name": "Vault Pulse",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"minAppVersion": "1.5.0",
-	"description": "Local vault radar + daily timed triage. Korean/English UI. Optional auto session at a set time. No AI.",
+	"description": "Local vault radar + daily triage. Open notes without ending the session. KO/EN UI. No AI.",
 	"author": "reallygood83",
 	"authorUrl": "https://github.com/reallygood83",
 	"isDesktopOnly": false

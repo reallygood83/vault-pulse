@@ -17,12 +17,24 @@ const en: Dict = {
   queueComplete:
     "Queue complete. Great work — end session or wait for the timer.",
   open: "Open",
+  openTooltip: "Open the note to edit. Session stays active — click the status bar to return.",
+  next: "Next card",
+  nextTooltip: "Done with this note for now — go to the next card (does not archive).",
   archive: "Archive",
   snooze: "Snooze",
   skip: "Skip",
   endSession: "End session",
+  pauseSession: "Hide panel",
+  pauseTooltip: "Hide this window. Timer keeps running. Resume from the status bar.",
+  sessionHint:
+    "Tip: Open a note to edit anytime. Closing × only hides this panel — it does NOT end the session. Use “End session” when finished.",
+  sessionPaused:
+    "Pulse session paused ({time} left). Click the status bar “Pulse” to resume.",
+  statusBarActive: "Pulse {time}",
+  statusBarPaused: "Pulse · resume {time}",
   timeUp: "Pulse session time is up.",
   actionFailed: "Pulse action failed. See console.",
+  cmdResume: "Resume Pulse session",
   scanning: "Vault Pulse: scanning vault…",
   scanComplete: "Vault Pulse: scan complete.",
   nothingToTriage: "Vault Pulse: nothing to triage right now.",
@@ -80,7 +92,7 @@ const en: Dict = {
   cmdRescan: "Rescan vault index",
   howToHeading: "How to use (simple)",
   howToBody:
-    "1) Rebuild queue → 2) Start session → 3) For each card: Open / Archive / Snooze / Skip → 4) Repeat for ~20 minutes. Archive moves (does not delete).",
+    "1) Rebuild queue → 2) Start session → 3) Open a note to edit (session stays alive) → 4) Return via status bar → 5) Archive / Snooze / Skip / Next. Closing × only hides the panel.",
 };
 
 const ko: Dict = {
@@ -99,12 +111,26 @@ const ko: Dict = {
   queueComplete:
     "큐를 모두 처리했습니다. 세션을 끝내거나 타이머가 끝날 때까지 기다려도 됩니다.",
   open: "열기",
+  openTooltip:
+    "노트를 열어 수정합니다. 세션은 유지됩니다. 상태바의 Pulse를 누르면 돌아옵니다.",
+  next: "다음 카드",
+  nextTooltip: "이 노트는 일단 끝 — 다음 카드로 (보관하지 않음).",
   archive: "보관",
   snooze: "나중에",
   skip: "건너뛰기",
   endSession: "세션 종료",
+  pauseSession: "패널 숨기기",
+  pauseTooltip:
+    "창만 숨깁니다. 타이머는 계속 갑니다. 상태바에서 다시 열 수 있습니다.",
+  sessionHint:
+    "팁: 「열기」로 노트를 수정하세요. × 로 닫아도 세션은 끝나지 않습니다. 끝낼 때만 「세션 종료」를 누르세요.",
+  sessionPaused:
+    "Pulse 세션 일시 숨김 (남은 시간 {time}). 상태바의 “Pulse”를 눌러 이어서 하세요.",
+  statusBarActive: "Pulse {time}",
+  statusBarPaused: "Pulse · 이어하기 {time}",
   timeUp: "Pulse 세션 시간이 끝났습니다.",
   actionFailed: "작업에 실패했습니다. 콘솔을 확인해 주세요.",
+  cmdResume: "Pulse 세션 이어하기",
   scanning: "Vault Pulse: vault 스캔 중…",
   scanComplete: "Vault Pulse: 스캔 완료.",
   nothingToTriage: "Vault Pulse: 지금 정리할 노트가 없습니다.",
@@ -162,7 +188,7 @@ const ko: Dict = {
   cmdRescan: "vault 인덱스 다시 스캔",
   howToHeading: "사용법 (간단)",
   howToBody:
-    "1) 큐 다시 만들기 → 2) 세션 시작 → 3) 카드마다 열기/보관/나중에/건너뛰기 → 4) 약 20분 반복. 보관은 삭제하지 않고 폴더로 옮깁니다.",
+    "1) 큐 다시 만들기 → 2) 세션 시작 → 3) 「열기」로 노트 수정 (세션 유지) → 4) 상태바 Pulse로 복귀 → 5) 보관/나중에/건너뛰기/다음 카드. × 닫기는 패널만 숨깁니다.",
 };
 
 const TABLES: Record<PulseLocale, Dict> = { en, ko };

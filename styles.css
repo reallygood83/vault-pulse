@@ -78,3 +78,23 @@
 .pulse-actions {
   margin-bottom: 8px;
 }
+
+.pulse-footer-actions {
+  margin-top: 4px;
+}
+
+.pulse-hint {
+  font-size: 0.85em;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.pulse-status-bar {
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.pulse-status-bar:hover {
+  opacity: 1;
+  text-decoration: underline;
+}

@@ -1,46 +1,48 @@
-import { App, Modal, Notice, Setting } from "obsidian";
+import { App, Modal, Setting } from "obsidian";
 import { t, type PulseLocale } from "../i18n";
-import type { ScoredNote, SessionStats } from "../types";
+import type { ActiveSession } from "../session/active-session";
+import type { ScoredNote } from "../types";
 
-export type SessionAction = "open" | "archive" | "snooze" | "skip";
+export type SessionAction =
+  | "open"
+  | "archive"
+  | "snooze"
+  | "skip"
+  | "next"
+  | "end"
+  | "pause";
 
 export interface SessionModalHandlers {
-  onAction: (note: ScoredNote, action: SessionAction) => Promise<void>;
-  onComplete: (stats: SessionStats, completed: boolean) => void;
-  minutes: number;
   locale: PulseLocale;
+  session: ActiveSession;
+  onAction: (note: ScoredNote, action: SessionAction) => Promise<void>;
+  /** X / Escape / backdrop — pause, do NOT end session */
+  onPause: () => void;
+  /** Explicit end session button or timer handled outside */
+  onRequestEnd: (auto: boolean) => void;
 }
 
+/**
+ * Session UI only. Closing this modal pauses the session;
+ * the plugin keeps timer + queue alive for resume.
+ */
 export class SessionModal extends Modal {
-  private queue: ScoredNote[];
-  private index = 0;
-  private remainingSec: number;
-  private timerId: number | null = null;
-  private stats: SessionStats;
   private handlers: SessionModalHandlers;
   private locale: PulseLocale;
+  private session: ActiveSession;
   private statusEl!: HTMLElement;
   private cardEl!: HTMLElement;
   private timerEl!: HTMLElement;
-  private closed = false;
+  private hintEl!: HTMLElement;
+  /** true when we intentionally close without ending (pause / open minimize) */
+  private suppressEnd = false;
+  private finishing = false;
 
-  constructor(
-    app: App,
-    queue: ScoredNote[],
-    handlers: SessionModalHandlers
-  ) {
+  constructor(app: App, handlers: SessionModalHandlers) {
     super(app);
-    this.queue = queue;
     this.handlers = handlers;
     this.locale = handlers.locale;
-    this.remainingSec = Math.max(60, handlers.minutes * 60);
-    this.stats = {
-      opened: 0,
-      archived: 0,
-      snoozed: 0,
-      skipped: 0,
-      target: queue.length,
-    };
+    this.session = handlers.session;
   }
 
   onOpen(): void {
@@ -52,6 +54,8 @@ export class SessionModal extends Modal {
     contentEl.createEl("h2", { text: t(L, "sessionTitle") });
     this.timerEl = contentEl.createDiv({ cls: "pulse-timer" });
     this.statusEl = contentEl.createDiv({ cls: "pulse-status" });
+    this.hintEl = contentEl.createDiv({ cls: "pulse-hint pulse-muted" });
+    this.hintEl.setText(t(L, "sessionHint"));
     this.cardEl = contentEl.createDiv({ cls: "pulse-card" });
 
     const actions = contentEl.createDiv({ cls: "pulse-actions" });
@@ -60,7 +64,14 @@ export class SessionModal extends Modal {
         b
           .setButtonText(t(L, "open"))
           .setCta()
+          .setTooltip(t(L, "openTooltip"))
           .onClick(() => void this.act("open"))
+      )
+      .addButton((b) =>
+        b
+          .setButtonText(t(L, "next"))
+          .setTooltip(t(L, "nextTooltip"))
+          .onClick(() => void this.act("next"))
       )
       .addButton((b) =>
         b
@@ -74,105 +85,127 @@ export class SessionModal extends Modal {
         b.setButtonText(t(L, "skip")).onClick(() => void this.act("skip"))
       );
 
-    new Setting(contentEl).addButton((b) =>
-      b
-        .setButtonText(t(L, "endSession"))
-        .onClick(() => this.finish(false))
-    );
+    const footer = contentEl.createDiv({ cls: "pulse-footer-actions" });
+    new Setting(footer)
+      .addButton((b) =>
+        b
+          .setButtonText(t(L, "pauseSession"))
+          .setTooltip(t(L, "pauseTooltip"))
+          .onClick(() => this.pauseAndClose())
+      )
+      .addButton((b) =>
+        b
+          .setButtonText(t(L, "endSession"))
+          .setWarning()
+          .onClick(() => this.requestEnd(false))
+      );
 
-    this.renderCard();
-    this.tickTimer();
-    this.timerId = window.setInterval(() => this.tickTimer(), 1000);
+    this.refresh();
+    this.session.startTimer(
+      () => this.refreshTimerOnly(),
+      () => this.requestEnd(true)
+    );
   }
 
   onClose(): void {
-    if (this.timerId != null) window.clearInterval(this.timerId);
-    if (!this.closed) {
-      this.closed = true;
-      this.handlers.onComplete(this.stats, this.isSuccess());
-    }
-  }
-
-  private tickTimer(): void {
-    if (this.remainingSec <= 0) {
-      this.finish(true);
+    // Do not stop the plugin timer here — only when ending session.
+    if (this.finishing) return;
+    if (this.suppressEnd) {
+      this.suppressEnd = false;
       return;
     }
-    const m = Math.floor(this.remainingSec / 60);
-    const s = this.remainingSec % 60;
-    this.timerEl.setText(
-      `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} ${t(this.locale, "remaining")}`
-    );
-    this.remainingSec -= 1;
+    // X button / Escape → pause, keep session
+    this.handlers.onPause();
+  }
+
+  /** Public: refresh after resume or action */
+  refresh(): void {
+    this.refreshTimerOnly();
+    this.renderCard();
+  }
+
+  private refreshTimerOnly(): void {
+    const sec = this.session.remainingSec;
+    const m = Math.floor(Math.max(0, sec) / 60);
+    const s = Math.max(0, sec) % 60;
+    if (this.timerEl) {
+      this.timerEl.setText(
+        `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} ${t(this.locale, "remaining")}`
+      );
+    }
+    if (this.statusEl) {
+      this.statusEl.setText(
+        t(this.locale, "cardProgress", {
+          current: Math.min(
+            this.session.index + 1,
+            this.session.queue.length
+          ),
+          total: this.session.queue.length,
+          done: this.session.doneCount,
+        })
+      );
+    }
   }
 
   private renderCard(): void {
     const L = this.locale;
-    const done =
-      this.stats.opened +
-      this.stats.archived +
-      this.stats.snoozed +
-      this.stats.skipped;
-    this.statusEl.setText(
-      t(L, "cardProgress", {
-        current: Math.min(this.index + 1, this.queue.length),
-        total: this.queue.length,
-        done,
-      })
-    );
-
+    if (!this.cardEl) return;
     this.cardEl.empty();
-    if (this.index >= this.queue.length) {
+    const note = this.session.current;
+    if (!note) {
       this.cardEl.createEl("p", { text: t(L, "queueComplete") });
       return;
     }
-    const note = this.queue[this.index];
     this.cardEl.createEl("h3", { text: note.title });
     this.cardEl.createEl("p", { cls: "pulse-explain", text: note.explain });
-    this.cardEl.createEl("p", {
-      cls: "pulse-path",
-      text: note.path,
-    });
+    this.cardEl.createEl("p", { cls: "pulse-path", text: note.path });
   }
 
   private async act(action: SessionAction): Promise<void> {
-    if (this.index >= this.queue.length) return;
-    const note = this.queue[this.index];
+    const note = this.session.current;
+    if (!note && action !== "end") return;
     try {
-      await this.handlers.onAction(note, action);
+      if (note) await this.handlers.onAction(note, action);
     } catch (e) {
       console.error(e);
-      new Notice(t(this.locale, "actionFailed"));
       return;
     }
-    if (action === "open") this.stats.opened += 1;
-    if (action === "archive") this.stats.archived += 1;
-    if (action === "snooze") this.stats.snoozed += 1;
-    if (action === "skip") this.stats.skipped += 1;
 
-    this.index += 1;
-    if (this.index >= this.queue.length) {
-      this.finish(true);
+    if (action === "open") {
+      // Minimize so user can edit; session continues
+      this.pauseAndClose();
       return;
     }
-    this.renderCard();
+
+    if (
+      action === "archive" ||
+      action === "snooze" ||
+      action === "skip" ||
+      action === "next"
+    ) {
+      const finished = this.session.advanceAfterResolve(
+        action === "next" ? "done" : action
+      );
+      if (finished) {
+        this.requestEnd(false);
+        return;
+      }
+      this.refresh();
+    }
   }
 
-  private isSuccess(): boolean {
-    const done =
-      this.stats.opened +
-      this.stats.archived +
-      this.stats.snoozed +
-      this.stats.skipped;
-    return this.stats.target > 0 && done / this.stats.target >= 0.5;
+  private pauseAndClose(): void {
+    this.suppressEnd = true;
+    this.session.paused = true;
+    this.handlers.onPause();
+    this.close();
   }
 
-  private finish(auto: boolean): void {
-    if (this.closed) return;
-    this.closed = true;
-    if (this.timerId != null) window.clearInterval(this.timerId);
-    this.handlers.onComplete(this.stats, this.isSuccess());
-    if (auto) new Notice(t(this.locale, "timeUp"));
+  private requestEnd(auto: boolean): void {
+    if (this.finishing) return;
+    this.finishing = true;
+    this.suppressEnd = true;
+    this.handlers.onRequestEnd(auto);
     this.close();
   }
 }

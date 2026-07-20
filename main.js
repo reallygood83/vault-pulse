@@ -267,12 +267,22 @@ var en = {
   cardProgress: "Card {current} / {total} \xB7 processed {done}",
   queueComplete: "Queue complete. Great work \u2014 end session or wait for the timer.",
   open: "Open",
+  openTooltip: "Open the note to edit. Session stays active \u2014 click the status bar to return.",
+  next: "Next card",
+  nextTooltip: "Done with this note for now \u2014 go to the next card (does not archive).",
   archive: "Archive",
   snooze: "Snooze",
   skip: "Skip",
   endSession: "End session",
+  pauseSession: "Hide panel",
+  pauseTooltip: "Hide this window. Timer keeps running. Resume from the status bar.",
+  sessionHint: "Tip: Open a note to edit anytime. Closing \xD7 only hides this panel \u2014 it does NOT end the session. Use \u201CEnd session\u201D when finished.",
+  sessionPaused: "Pulse session paused ({time} left). Click the status bar \u201CPulse\u201D to resume.",
+  statusBarActive: "Pulse {time}",
+  statusBarPaused: "Pulse \xB7 resume {time}",
   timeUp: "Pulse session time is up.",
   actionFailed: "Pulse action failed. See console.",
+  cmdResume: "Resume Pulse session",
   scanning: "Vault Pulse: scanning vault\u2026",
   scanComplete: "Vault Pulse: scan complete.",
   nothingToTriage: "Vault Pulse: nothing to triage right now.",
@@ -321,7 +331,7 @@ var en = {
   cmdOpenView: "Open Pulse view",
   cmdRescan: "Rescan vault index",
   howToHeading: "How to use (simple)",
-  howToBody: "1) Rebuild queue \u2192 2) Start session \u2192 3) For each card: Open / Archive / Snooze / Skip \u2192 4) Repeat for ~20 minutes. Archive moves (does not delete)."
+  howToBody: "1) Rebuild queue \u2192 2) Start session \u2192 3) Open a note to edit (session stays alive) \u2192 4) Return via status bar \u2192 5) Archive / Snooze / Skip / Next. Closing \xD7 only hides the panel."
 };
 var ko = {
   pluginName: "Vault Pulse",
@@ -336,12 +346,22 @@ var ko = {
   cardProgress: "\uCE74\uB4DC {current} / {total} \xB7 \uCC98\uB9AC {done}",
   queueComplete: "\uD050\uB97C \uBAA8\uB450 \uCC98\uB9AC\uD588\uC2B5\uB2C8\uB2E4. \uC138\uC158\uC744 \uB05D\uB0B4\uAC70\uB098 \uD0C0\uC774\uBA38\uAC00 \uB05D\uB0A0 \uB54C\uAE4C\uC9C0 \uAE30\uB2E4\uB824\uB3C4 \uB429\uB2C8\uB2E4.",
   open: "\uC5F4\uAE30",
+  openTooltip: "\uB178\uD2B8\uB97C \uC5F4\uC5B4 \uC218\uC815\uD569\uB2C8\uB2E4. \uC138\uC158\uC740 \uC720\uC9C0\uB429\uB2C8\uB2E4. \uC0C1\uD0DC\uBC14\uC758 Pulse\uB97C \uB204\uB974\uBA74 \uB3CC\uC544\uC635\uB2C8\uB2E4.",
+  next: "\uB2E4\uC74C \uCE74\uB4DC",
+  nextTooltip: "\uC774 \uB178\uD2B8\uB294 \uC77C\uB2E8 \uB05D \u2014 \uB2E4\uC74C \uCE74\uB4DC\uB85C (\uBCF4\uAD00\uD558\uC9C0 \uC54A\uC74C).",
   archive: "\uBCF4\uAD00",
   snooze: "\uB098\uC911\uC5D0",
   skip: "\uAC74\uB108\uB6F0\uAE30",
   endSession: "\uC138\uC158 \uC885\uB8CC",
+  pauseSession: "\uD328\uB110 \uC228\uAE30\uAE30",
+  pauseTooltip: "\uCC3D\uB9CC \uC228\uAE41\uB2C8\uB2E4. \uD0C0\uC774\uBA38\uB294 \uACC4\uC18D \uAC11\uB2C8\uB2E4. \uC0C1\uD0DC\uBC14\uC5D0\uC11C \uB2E4\uC2DC \uC5F4 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",
+  sessionHint: "\uD301: \u300C\uC5F4\uAE30\u300D\uB85C \uB178\uD2B8\uB97C \uC218\uC815\uD558\uC138\uC694. \xD7 \uB85C \uB2EB\uC544\uB3C4 \uC138\uC158\uC740 \uB05D\uB098\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. \uB05D\uB0BC \uB54C\uB9CC \u300C\uC138\uC158 \uC885\uB8CC\u300D\uB97C \uB204\uB974\uC138\uC694.",
+  sessionPaused: "Pulse \uC138\uC158 \uC77C\uC2DC \uC228\uAE40 (\uB0A8\uC740 \uC2DC\uAC04 {time}). \uC0C1\uD0DC\uBC14\uC758 \u201CPulse\u201D\uB97C \uB20C\uB7EC \uC774\uC5B4\uC11C \uD558\uC138\uC694.",
+  statusBarActive: "Pulse {time}",
+  statusBarPaused: "Pulse \xB7 \uC774\uC5B4\uD558\uAE30 {time}",
   timeUp: "Pulse \uC138\uC158 \uC2DC\uAC04\uC774 \uB05D\uB0AC\uC2B5\uB2C8\uB2E4.",
   actionFailed: "\uC791\uC5C5\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uCF58\uC194\uC744 \uD655\uC778\uD574 \uC8FC\uC138\uC694.",
+  cmdResume: "Pulse \uC138\uC158 \uC774\uC5B4\uD558\uAE30",
   scanning: "Vault Pulse: vault \uC2A4\uCE94 \uC911\u2026",
   scanComplete: "Vault Pulse: \uC2A4\uCE94 \uC644\uB8CC.",
   nothingToTriage: "Vault Pulse: \uC9C0\uAE08 \uC815\uB9AC\uD560 \uB178\uD2B8\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.",
@@ -390,7 +410,7 @@ var ko = {
   cmdOpenView: "Pulse \uBCF4\uAE30 \uC5F4\uAE30",
   cmdRescan: "vault \uC778\uB371\uC2A4 \uB2E4\uC2DC \uC2A4\uCE94",
   howToHeading: "\uC0AC\uC6A9\uBC95 (\uAC04\uB2E8)",
-  howToBody: "1) \uD050 \uB2E4\uC2DC \uB9CC\uB4E4\uAE30 \u2192 2) \uC138\uC158 \uC2DC\uC791 \u2192 3) \uCE74\uB4DC\uB9C8\uB2E4 \uC5F4\uAE30/\uBCF4\uAD00/\uB098\uC911\uC5D0/\uAC74\uB108\uB6F0\uAE30 \u2192 4) \uC57D 20\uBD84 \uBC18\uBCF5. \uBCF4\uAD00\uC740 \uC0AD\uC81C\uD558\uC9C0 \uC54A\uACE0 \uD3F4\uB354\uB85C \uC62E\uAE41\uB2C8\uB2E4."
+  howToBody: "1) \uD050 \uB2E4\uC2DC \uB9CC\uB4E4\uAE30 \u2192 2) \uC138\uC158 \uC2DC\uC791 \u2192 3) \u300C\uC5F4\uAE30\u300D\uB85C \uB178\uD2B8 \uC218\uC815 (\uC138\uC158 \uC720\uC9C0) \u2192 4) \uC0C1\uD0DC\uBC14 Pulse\uB85C \uBCF5\uADC0 \u2192 5) \uBCF4\uAD00/\uB098\uC911\uC5D0/\uAC74\uB108\uB6F0\uAE30/\uB2E4\uC74C \uCE74\uB4DC. \xD7 \uB2EB\uAE30\uB294 \uD328\uB110\uB9CC \uC228\uAE41\uB2C8\uB2E4."
 };
 var TABLES = { en, ko };
 function t(locale, key, vars) {
@@ -545,6 +565,73 @@ function msUntilNextSchedule(settings, now = /* @__PURE__ */ new Date()) {
   }
   return next.getTime() - now.getTime();
 }
+
+// src/session/active-session.ts
+var ActiveSession = class {
+  constructor(queue, minutes) {
+    this.index = 0;
+    this.paused = false;
+    this.ended = false;
+    this.timerId = null;
+    this.onTick = null;
+    this.onTimeUp = null;
+    this.queue = queue;
+    this.remainingSec = Math.max(60, minutes * 60);
+    this.stats = {
+      opened: 0,
+      archived: 0,
+      snoozed: 0,
+      skipped: 0,
+      target: queue.length
+    };
+  }
+  get current() {
+    if (this.index >= this.queue.length) return null;
+    return this.queue[this.index];
+  }
+  get doneCount() {
+    return this.stats.opened + this.stats.archived + this.stats.snoozed + this.stats.skipped;
+  }
+  isSuccess() {
+    return this.stats.target > 0 && this.doneCount / this.stats.target >= 0.5;
+  }
+  startTimer(onTick, onTimeUp) {
+    this.onTick = onTick;
+    this.onTimeUp = onTimeUp;
+    if (this.timerId != null) window.clearInterval(this.timerId);
+    this.timerId = window.setInterval(() => {
+      if (this.ended) return;
+      if (this.remainingSec <= 0) {
+        this.stopTimer();
+        this.onTimeUp?.();
+        return;
+      }
+      this.remainingSec -= 1;
+      this.onTick?.();
+    }, 1e3);
+  }
+  stopTimer() {
+    if (this.timerId != null) {
+      window.clearInterval(this.timerId);
+      this.timerId = null;
+    }
+  }
+  /** Open note: count once, do NOT advance card (user may edit then return). */
+  markOpened() {
+    this.stats.opened += 1;
+  }
+  advanceAfterResolve(kind) {
+    if (kind === "archive") this.stats.archived += 1;
+    if (kind === "snooze") this.stats.snoozed += 1;
+    if (kind === "skip") this.stats.skipped += 1;
+    this.index += 1;
+    return this.index >= this.queue.length;
+  }
+  end() {
+    this.ended = true;
+    this.stopTimer();
+  }
+};
 
 // src/settings.ts
 var import_obsidian2 = require("obsidian");
@@ -710,22 +797,14 @@ var DEFAULT_SETTINGS = {
 // src/ui/session-modal.ts
 var import_obsidian3 = require("obsidian");
 var SessionModal = class extends import_obsidian3.Modal {
-  constructor(app, queue, handlers) {
+  constructor(app, handlers) {
     super(app);
-    this.index = 0;
-    this.timerId = null;
-    this.closed = false;
-    this.queue = queue;
+    /** true when we intentionally close without ending (pause / open minimize) */
+    this.suppressEnd = false;
+    this.finishing = false;
     this.handlers = handlers;
     this.locale = handlers.locale;
-    this.remainingSec = Math.max(60, handlers.minutes * 60);
-    this.stats = {
-      opened: 0,
-      archived: 0,
-      snoozed: 0,
-      skipped: 0,
-      target: queue.length
-    };
+    this.session = handlers.session;
   }
   onOpen() {
     const { contentEl } = this;
@@ -735,10 +814,14 @@ var SessionModal = class extends import_obsidian3.Modal {
     contentEl.createEl("h2", { text: t(L, "sessionTitle") });
     this.timerEl = contentEl.createDiv({ cls: "pulse-timer" });
     this.statusEl = contentEl.createDiv({ cls: "pulse-status" });
+    this.hintEl = contentEl.createDiv({ cls: "pulse-hint pulse-muted" });
+    this.hintEl.setText(t(L, "sessionHint"));
     this.cardEl = contentEl.createDiv({ cls: "pulse-card" });
     const actions = contentEl.createDiv({ cls: "pulse-actions" });
     new import_obsidian3.Setting(actions).addButton(
-      (b) => b.setButtonText(t(L, "open")).setCta().onClick(() => void this.act("open"))
+      (b) => b.setButtonText(t(L, "open")).setCta().setTooltip(t(L, "openTooltip")).onClick(() => void this.act("open"))
+    ).addButton(
+      (b) => b.setButtonText(t(L, "next")).setTooltip(t(L, "nextTooltip")).onClick(() => void this.act("next"))
     ).addButton(
       (b) => b.setButtonText(t(L, "archive")).onClick(() => void this.act("archive"))
     ).addButton(
@@ -746,86 +829,101 @@ var SessionModal = class extends import_obsidian3.Modal {
     ).addButton(
       (b) => b.setButtonText(t(L, "skip")).onClick(() => void this.act("skip"))
     );
-    new import_obsidian3.Setting(contentEl).addButton(
-      (b) => b.setButtonText(t(L, "endSession")).onClick(() => this.finish(false))
+    const footer = contentEl.createDiv({ cls: "pulse-footer-actions" });
+    new import_obsidian3.Setting(footer).addButton(
+      (b) => b.setButtonText(t(L, "pauseSession")).setTooltip(t(L, "pauseTooltip")).onClick(() => this.pauseAndClose())
+    ).addButton(
+      (b) => b.setButtonText(t(L, "endSession")).setWarning().onClick(() => this.requestEnd(false))
     );
-    this.renderCard();
-    this.tickTimer();
-    this.timerId = window.setInterval(() => this.tickTimer(), 1e3);
+    this.refresh();
+    this.session.startTimer(
+      () => this.refreshTimerOnly(),
+      () => this.requestEnd(true)
+    );
   }
   onClose() {
-    if (this.timerId != null) window.clearInterval(this.timerId);
-    if (!this.closed) {
-      this.closed = true;
-      this.handlers.onComplete(this.stats, this.isSuccess());
-    }
-  }
-  tickTimer() {
-    if (this.remainingSec <= 0) {
-      this.finish(true);
+    if (this.finishing) return;
+    if (this.suppressEnd) {
+      this.suppressEnd = false;
       return;
     }
-    const m = Math.floor(this.remainingSec / 60);
-    const s = this.remainingSec % 60;
-    this.timerEl.setText(
-      `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} ${t(this.locale, "remaining")}`
-    );
-    this.remainingSec -= 1;
+    this.handlers.onPause();
+  }
+  /** Public: refresh after resume or action */
+  refresh() {
+    this.refreshTimerOnly();
+    this.renderCard();
+  }
+  refreshTimerOnly() {
+    const sec = this.session.remainingSec;
+    const m = Math.floor(Math.max(0, sec) / 60);
+    const s = Math.max(0, sec) % 60;
+    if (this.timerEl) {
+      this.timerEl.setText(
+        `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")} ${t(this.locale, "remaining")}`
+      );
+    }
+    if (this.statusEl) {
+      this.statusEl.setText(
+        t(this.locale, "cardProgress", {
+          current: Math.min(
+            this.session.index + 1,
+            this.session.queue.length
+          ),
+          total: this.session.queue.length,
+          done: this.session.doneCount
+        })
+      );
+    }
   }
   renderCard() {
     const L = this.locale;
-    const done = this.stats.opened + this.stats.archived + this.stats.snoozed + this.stats.skipped;
-    this.statusEl.setText(
-      t(L, "cardProgress", {
-        current: Math.min(this.index + 1, this.queue.length),
-        total: this.queue.length,
-        done
-      })
-    );
+    if (!this.cardEl) return;
     this.cardEl.empty();
-    if (this.index >= this.queue.length) {
+    const note = this.session.current;
+    if (!note) {
       this.cardEl.createEl("p", { text: t(L, "queueComplete") });
       return;
     }
-    const note = this.queue[this.index];
     this.cardEl.createEl("h3", { text: note.title });
     this.cardEl.createEl("p", { cls: "pulse-explain", text: note.explain });
-    this.cardEl.createEl("p", {
-      cls: "pulse-path",
-      text: note.path
-    });
+    this.cardEl.createEl("p", { cls: "pulse-path", text: note.path });
   }
   async act(action) {
-    if (this.index >= this.queue.length) return;
-    const note = this.queue[this.index];
+    const note = this.session.current;
+    if (!note && action !== "end") return;
     try {
-      await this.handlers.onAction(note, action);
+      if (note) await this.handlers.onAction(note, action);
     } catch (e) {
       console.error(e);
-      new import_obsidian3.Notice(t(this.locale, "actionFailed"));
       return;
     }
-    if (action === "open") this.stats.opened += 1;
-    if (action === "archive") this.stats.archived += 1;
-    if (action === "snooze") this.stats.snoozed += 1;
-    if (action === "skip") this.stats.skipped += 1;
-    this.index += 1;
-    if (this.index >= this.queue.length) {
-      this.finish(true);
+    if (action === "open") {
+      this.pauseAndClose();
       return;
     }
-    this.renderCard();
+    if (action === "archive" || action === "snooze" || action === "skip" || action === "next") {
+      const finished = this.session.advanceAfterResolve(
+        action === "next" ? "done" : action
+      );
+      if (finished) {
+        this.requestEnd(false);
+        return;
+      }
+      this.refresh();
+    }
   }
-  isSuccess() {
-    const done = this.stats.opened + this.stats.archived + this.stats.snoozed + this.stats.skipped;
-    return this.stats.target > 0 && done / this.stats.target >= 0.5;
+  pauseAndClose() {
+    this.suppressEnd = true;
+    this.session.paused = true;
+    this.handlers.onPause();
+    this.close();
   }
-  finish(auto) {
-    if (this.closed) return;
-    this.closed = true;
-    if (this.timerId != null) window.clearInterval(this.timerId);
-    this.handlers.onComplete(this.stats, this.isSuccess());
-    if (auto) new import_obsidian3.Notice(t(this.locale, "timeUp"));
+  requestEnd(auto) {
+    if (this.finishing) return;
+    this.finishing = true;
+    this.suppressEnd = true;
+    this.handlers.onRequestEnd(auto);
     this.close();
   }
 };
@@ -918,7 +1016,11 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
     };
     this.scheduleTimer = null;
     this.cachedQueue = [];
-    this.sessionOpen = false;
+    /** Live session (survives modal close) */
+    this.active = null;
+    this.modal = null;
+    this.statusEl = null;
+    this.statusTimer = null;
   }
   async onload() {
     await this.loadSettings();
@@ -950,12 +1052,25 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
       return view;
     });
     this.addRibbonIcon("activity", "Vault Pulse", () => {
-      void this.activateView();
+      if (this.active && !this.active.ended) {
+        this.resumeSession();
+      } else {
+        void this.activateView();
+      }
     });
     this.addCommand({
       id: "pulse-start-session",
       name: t(this.settings.locale, "cmdStart"),
       callback: () => void this.startSession()
+    });
+    this.addCommand({
+      id: "pulse-resume-session",
+      name: t(this.settings.locale, "cmdResume"),
+      checkCallback: (checking) => {
+        const ok = !!(this.active && !this.active.ended);
+        if (ok && !checking) this.resumeSession();
+        return ok;
+      }
     });
     this.addCommand({
       id: "pulse-open-view",
@@ -968,6 +1083,10 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
       callback: () => void this.rescan()
     });
     this.addSettingTab(new PulseSettingTab(this.app, this));
+    this.statusEl = this.addStatusBarItem();
+    this.statusEl.addClass("pulse-status-bar");
+    this.statusEl.hide();
+    this.statusEl.onclick = () => this.resumeSession();
     void this.app.workspace.onLayoutReady(async () => {
       await this.index.ensureReady();
       await this.rebuildQueue(false);
@@ -988,6 +1107,12 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
       window.clearTimeout(this.scheduleTimer);
       this.scheduleTimer = null;
     }
+    this.clearStatusBar();
+    if (this.active) {
+      this.active.end();
+      this.active = null;
+    }
+    this.modal = null;
     for (const leaf of this.app.workspace.getLeavesOfType(PULSE_VIEW_TYPE)) {
       leaf.detach();
     }
@@ -1013,7 +1138,6 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
       index: raw?.index ?? null
     });
   }
-  /** Called when language changes in settings */
   onLocaleChange() {
     void this.rebuildQueue(false).then(() => this.refreshOpenViews());
   }
@@ -1085,32 +1209,118 @@ var VaultPulsePlugin = class extends import_obsidian5.Plugin {
     }
   }
   async startSession() {
-    if (this.sessionOpen) return;
+    if (this.active && !this.active.ended) {
+      this.resumeSession();
+      return;
+    }
     await this.rebuildQueue(false);
     const L = this.settings.locale;
     if (this.cachedQueue.length === 0) {
       new import_obsidian5.Notice(t(L, "nothingToTriage"));
       return;
     }
-    const queue = [...this.cachedQueue];
-    this.sessionOpen = true;
-    new SessionModal(this.app, queue, {
-      minutes: this.settings.sessionMinutes,
-      locale: this.settings.locale,
-      onAction: (note, action) => this.handleAction(note, action),
-      onComplete: (stats, completed) => {
-        this.sessionOpen = false;
-        void this.finishSession(stats, completed);
+    this.active = new ActiveSession(
+      [...this.cachedQueue],
+      this.settings.sessionMinutes
+    );
+    this.showStatusBar();
+    this.openSessionModal();
+  }
+  resumeSession() {
+    if (!this.active || this.active.ended) {
+      void this.startSession();
+      return;
+    }
+    this.active.paused = false;
+    this.showStatusBar();
+    this.openSessionModal();
+  }
+  openSessionModal() {
+    if (!this.active || this.active.ended) return;
+    if (this.modal) {
+      try {
+        this.modal.close();
+      } catch {
       }
-    }).open();
+      this.modal = null;
+    }
+    const session = this.active;
+    const modal = new SessionModal(this.app, {
+      locale: this.settings.locale,
+      session,
+      onAction: (note, action) => this.handleAction(note, action),
+      onPause: () => this.onSessionPaused(),
+      onRequestEnd: (auto) => this.endActiveSession(auto)
+    });
+    this.modal = modal;
+    modal.open();
+  }
+  onSessionPaused() {
+    if (!this.active || this.active.ended) return;
+    this.active.paused = true;
+    this.modal = null;
+    this.showStatusBar();
+    const time = this.formatTime(this.active.remainingSec);
+    new import_obsidian5.Notice(t(this.settings.locale, "sessionPaused", { time }));
+  }
+  endActiveSession(auto) {
+    if (!this.active) return;
+    const stats = { ...this.active.stats };
+    const completed = this.active.isSuccess();
+    this.active.end();
+    this.active = null;
+    this.modal = null;
+    this.clearStatusBar();
+    if (auto) new import_obsidian5.Notice(t(this.settings.locale, "timeUp"));
+    void this.finishSession(stats, completed);
+  }
+  formatTime(sec) {
+    const m = Math.floor(Math.max(0, sec) / 60);
+    const s = Math.max(0, sec) % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+  showStatusBar() {
+    if (!this.statusEl || !this.active) return;
+    this.statusEl.show();
+    this.updateStatusBar();
+    if (this.statusTimer != null) window.clearInterval(this.statusTimer);
+    this.statusTimer = window.setInterval(() => this.updateStatusBar(), 1e3);
+  }
+  updateStatusBar() {
+    if (!this.statusEl || !this.active || this.active.ended) {
+      this.clearStatusBar();
+      return;
+    }
+    const time = this.formatTime(this.active.remainingSec);
+    const key = this.active.paused ? "statusBarPaused" : "statusBarActive";
+    this.statusEl.setText(t(this.settings.locale, key, { time }));
+    this.statusEl.setAttr(
+      "aria-label",
+      t(this.settings.locale, "cmdResume")
+    );
+  }
+  clearStatusBar() {
+    if (this.statusTimer != null) {
+      window.clearInterval(this.statusTimer);
+      this.statusTimer = null;
+    }
+    if (this.statusEl) {
+      this.statusEl.setText("");
+      this.statusEl.hide();
+    }
   }
   async handleAction(note, action) {
     const L = this.settings.locale;
+    if (!this.active) return;
     if (action === "open") {
       const file = this.app.vault.getAbstractFileByPath(note.path);
       if (file instanceof import_obsidian5.TFile) {
         await this.app.workspace.getLeaf(false).openFile(file);
       }
+      this.active.markOpened();
+      return;
+    }
+    if (action === "next") {
       return;
     }
     if (action === "snooze") {
