@@ -1,6 +1,6 @@
 {
   "name": "note-sweep",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Local note radar + daily timed triage for Obsidian. Korean/English UI. No AI.",
   "main": "main.js",
   "scripts": {

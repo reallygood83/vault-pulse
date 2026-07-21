@@ -1,10 +1,10 @@
 {
-	"id": "note-sweep",
-	"name": "Note Sweep",
-	"version": "0.3.3",
-	"minAppVersion": "1.5.0",
-	"description": "Local vault radar + triage. Open notes, trash, open Obsigravity chat. KO/EN. No AI.",
-	"author": "reallygood83",
-	"authorUrl": "https://github.com/reallygood83",
-	"isDesktopOnly": false
+  "id": "note-sweep",
+  "name": "Note Sweep",
+  "version": "0.3.4",
+  "minAppVersion": "1.5.0",
+  "description": "Local vault radar + triage. Open notes, trash, open Obsigravity chat. KO/EN. No AI.",
+  "author": "reallygood83",
+  "authorUrl": "https://github.com/reallygood83",
+  "isDesktopOnly": false
 }
