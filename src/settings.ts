@@ -17,14 +17,11 @@ export class PulseSettingTab extends PluginSettingTab {
     const L = this.plugin.settings.locale;
     const s = this.plugin.settings;
 
-    containerEl.createEl("h2", { text: t(L, "settingsTitle") });
-    containerEl.createEl("p", { text: t(L, "settingsIntro") });
+    new Setting(containerEl).setName(t(L, "settingsTitle")).setHeading();
+    new Setting(containerEl).setDesc(t(L, "settingsIntro"));
 
-    containerEl.createEl("h3", { text: t(L, "howToHeading") });
-    containerEl.createEl("p", {
-      cls: "pulse-muted",
-      text: t(L, "howToBody"),
-    });
+    new Setting(containerEl).setName(t(L, "howToHeading")).setHeading();
+    new Setting(containerEl).setDesc(t(L, "howToBody"));
 
     new Setting(containerEl)
       .setName(t(L, "language"))
@@ -35,7 +32,7 @@ export class PulseSettingTab extends PluginSettingTab {
           .addOption("ko", "한국어")
           .setValue(s.locale)
           .onChange(async (v) => {
-            s.locale = (v === "ko" ? "ko" : "en") as PulseLocale;
+            s.locale = v === "ko" ? "ko" : "en";
             await this.plugin.saveSettings();
             this.plugin.onLocaleChange();
             this.display();
@@ -145,7 +142,7 @@ export class PulseSettingTab extends PluginSettingTab {
         })
       );
 
-    containerEl.createEl("h3", { text: t(L, "scheduleHeading") });
+    new Setting(containerEl).setName(t(L, "scheduleHeading")).setHeading();
 
     new Setting(containerEl)
       .setName(t(L, "scheduleEnabled"))
@@ -179,19 +176,18 @@ export class PulseSettingTab extends PluginSettingTab {
         })
       );
 
-    containerEl.createEl("h3", { text: t(L, "weightsHeading") });
+    new Setting(containerEl).setName(t(L, "weightsHeading")).setHeading();
     this.weightSetting(containerEl, s, L, "stale", "weightStale");
     this.weightSetting(containerEl, s, L, "orphan", "weightOrphan");
     this.weightSetting(containerEl, s, L, "duplicate", "weightDuplicate");
     this.weightSetting(containerEl, s, L, "avoidance", "weightAvoidance");
 
-    containerEl.createEl("p", {
-      cls: "pulse-muted",
-      text: t(L, "streakLine", {
+    new Setting(containerEl).setDesc(
+      t(L, "streakLine", {
         days: s.streakDays,
         last: s.lastSessionDate || "—",
-      }),
-    });
+      })
+    );
   }
 
   private weightSetting(

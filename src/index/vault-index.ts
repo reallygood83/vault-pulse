@@ -1,4 +1,4 @@
-import { App, TFile, TFolder, debounce } from "obsidian";
+import { App, TFile, debounce } from "obsidian";
 import type { NoteIndexEntry, PulseIndexData, PulseSettings } from "../types";
 import { isExcludedPath } from "../utils/paths";
 import {

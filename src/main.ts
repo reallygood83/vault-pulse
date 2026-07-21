@@ -23,6 +23,7 @@ import {
 } from "./types";
 import { SessionModal, type SessionAction } from "./ui/session-modal";
 import { PULSE_VIEW_TYPE, PulseView } from "./ui/pulse-view";
+import { confirmAction } from "./ui/confirm-modal";
 import { openNoteInObsigravity } from "./obsigravity-bridge";
 import { archiveTargetPath } from "./utils/paths";
 import { addDaysIso, todayKey } from "./utils/text";
@@ -266,15 +267,20 @@ export default class NoteSweepPlugin extends Plugin {
       new Notice(t(L, "deleteFailed"));
       return;
     }
-    const ok = window.confirm(t(L, "deleteConfirm", { path }));
+    const ok = await confirmAction(
+      this.app,
+      t(L, "deleteConfirm", { path }),
+      t(L, "delete"),
+      t(L, "cancel")
+    );
     if (!ok) return;
     try {
-      await this.app.vault.trash(file, true);
+      // Respect user trash preference (.trash vs system trash)
+      await this.app.fileManager.trashFile(file);
       new Notice(t(L, "deleted", { path }));
       await this.rebuildQueue(true);
       this.refreshOpenViews();
-    } catch (e) {
-      console.error(e);
+    } catch {
       new Notice(t(L, "deleteFailed"));
     }
   }
@@ -292,10 +298,13 @@ export default class NoteSweepPlugin extends Plugin {
       leaf = existing[0];
     } else {
       leaf = workspace.getRightLeaf(false);
-      await leaf?.setViewState({ type: PULSE_VIEW_TYPE, active: true });
+      if (leaf) {
+        await leaf.setViewState({ type: PULSE_VIEW_TYPE, active: true });
+      }
     }
     if (leaf) {
-      workspace.revealLeaf(leaf);
+      // setActiveLeaf is available since 0.16.3 (avoid revealLeaf @since 1.7.2)
+      workspace.setActiveLeaf(leaf, { focus: true });
       await this.rebuildQueue(false);
       this.refreshOpenViews();
     }

@@ -2,13 +2,17 @@ import { App, Notice, TFile } from "obsidian";
 import { t, type PulseLocale } from "./i18n";
 
 const OBSIGRAVITY_ID = "obsigravity";
-const BRAT_URL = "https://github.com/TfTHacker/obsidian42-brat";
-const OBSIGRAVITY_REPO = "https://github.com/reallygood83/obsigravity";
 
 interface ObsigravityPluginLike {
   activateView?: () => Promise<void>;
   pinNote?: (path: string) => Promise<void>;
   lastActiveMarkdownFile?: TFile | null;
+}
+
+interface AppWithCommands {
+  commands?: {
+    executeCommandById?: (id: string) => boolean | Promise<boolean>;
+  };
 }
 
 function getObsigravity(app: App): ObsigravityPluginLike | null {
@@ -30,14 +34,11 @@ function getObsigravity(app: App): ObsigravityPluginLike | null {
 
 export function showObsigravityInstallGuide(locale: PulseLocale): void {
   new Notice(t(locale, "obsigravityMissing"), 12000);
-  console.info(
-    `[Note Sweep] Install Obsigravity via BRAT:\n1) Install BRAT: ${BRAT_URL}\n2) Add plugin: reallygood83/obsigravity\n3) Repo: ${OBSIGRAVITY_REPO}`
-  );
 }
 
 /**
  * Simple handoff: open the queue note as active, then open Obsigravity.
- * User types the request in Obsigravity chat (no Pulse prompt modal).
+ * User types the request in Obsigravity chat (no prompt modal).
  */
 export async function openNoteInObsigravity(
   app: App,
@@ -50,7 +51,6 @@ export async function openNoteInObsigravity(
     return;
   }
 
-  // 1) Open exact note in editor (active)
   await app.workspace.getLeaf(false).openFile(file, { active: true });
 
   const og = getObsigravity(app);
@@ -59,26 +59,26 @@ export async function openNoteInObsigravity(
     return;
   }
 
-  // 2) Best-effort pin so Obsigravity context chips show this note
   try {
     if (typeof og.pinNote === "function") {
       await og.pinNote(notePath.replace(/\\/g, "/"));
     }
-  } catch (e) {
-    console.warn("[Note Sweep] pinNote failed", e);
+  } catch {
+    // Optional pin — ignore if Obsigravity does not support it
   }
 
-  // 3) Open Obsigravity sidebar
   try {
     if (typeof og.activateView === "function") {
       await og.activateView();
     } else {
-      // @ts-expect-error command API
-      await app.commands.executeCommandById("obsigravity:open-obsigravity");
+      const commands = (app as App & AppWithCommands).commands;
+      const exec = commands?.executeCommandById;
+      if (typeof exec === "function") {
+        await Promise.resolve(exec.call(commands, "obsigravity:open-obsigravity"));
+      }
     }
     new Notice(t(locale, "obsigravityOpened"), 6000);
-  } catch (e) {
-    console.error("[Note Sweep] open Obsigravity failed", e);
+  } catch {
     new Notice(t(locale, "obsigravityUpdateFailed"), 8000);
   }
 }

@@ -166,8 +166,7 @@ export class SessionModal extends Modal {
     if (!note && action !== "end") return;
     try {
       if (note) await this.handlers.onAction(note, action);
-    } catch (e) {
-      console.error(e);
+    } catch {
       return;
     }
 

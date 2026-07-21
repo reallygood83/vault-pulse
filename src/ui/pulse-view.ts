@@ -1,4 +1,4 @@
-import { ItemView, Notice, WorkspaceLeaf } from "obsidian";
+import { ItemView, WorkspaceLeaf } from "obsidian";
 import { t, type PulseLocale } from "../i18n";
 import type { ScoredNote } from "../types";
 
@@ -108,13 +108,13 @@ export class PulseView extends ItemView {
         }
       };
 
-      const title = body.createEl("div", {
+      const title = body.createDiv({
         cls: "pulse-q-title",
         text: n.title,
       });
       title.setAttr("title", n.path);
-      body.createEl("div", { cls: "pulse-q-explain", text: n.explain });
-      body.createEl("div", {
+      body.createDiv({ cls: "pulse-q-explain", text: n.explain });
+      body.createDiv({
         cls: "pulse-q-score",
         text: `${t(L, "score")} ${n.score.toFixed(1)}`,
       });

@@ -27,7 +27,7 @@ __export(main_exports, {
   default: () => NoteSweepPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian6 = require("obsidian");
+var import_obsidian7 = require("obsidian");
 
 // src/index/vault-index.ts
 var import_obsidian = require("obsidian");
@@ -669,13 +669,10 @@ var PulseSettingTab = class extends import_obsidian2.PluginSettingTab {
     containerEl.empty();
     const L = this.plugin.settings.locale;
     const s = this.plugin.settings;
-    containerEl.createEl("h2", { text: t(L, "settingsTitle") });
-    containerEl.createEl("p", { text: t(L, "settingsIntro") });
-    containerEl.createEl("h3", { text: t(L, "howToHeading") });
-    containerEl.createEl("p", {
-      cls: "pulse-muted",
-      text: t(L, "howToBody")
-    });
+    new import_obsidian2.Setting(containerEl).setName(t(L, "settingsTitle")).setHeading();
+    new import_obsidian2.Setting(containerEl).setDesc(t(L, "settingsIntro"));
+    new import_obsidian2.Setting(containerEl).setName(t(L, "howToHeading")).setHeading();
+    new import_obsidian2.Setting(containerEl).setDesc(t(L, "howToBody"));
     new import_obsidian2.Setting(containerEl).setName(t(L, "language")).setDesc(t(L, "languageDesc")).addDropdown(
       (d) => d.addOption("en", "English").addOption("ko", "\uD55C\uAD6D\uC5B4").setValue(s.locale).onChange(async (v) => {
         s.locale = v === "ko" ? "ko" : "en";
@@ -750,7 +747,7 @@ var PulseSettingTab = class extends import_obsidian2.PluginSettingTab {
         }
       })
     );
-    containerEl.createEl("h3", { text: t(L, "scheduleHeading") });
+    new import_obsidian2.Setting(containerEl).setName(t(L, "scheduleHeading")).setHeading();
     new import_obsidian2.Setting(containerEl).setName(t(L, "scheduleEnabled")).setDesc(t(L, "scheduleEnabledDesc")).addToggle(
       (tog) => tog.setValue(s.scheduleEnabled).onChange(async (v) => {
         s.scheduleEnabled = v;
@@ -771,18 +768,17 @@ var PulseSettingTab = class extends import_obsidian2.PluginSettingTab {
         await this.plugin.saveSettings();
       })
     );
-    containerEl.createEl("h3", { text: t(L, "weightsHeading") });
+    new import_obsidian2.Setting(containerEl).setName(t(L, "weightsHeading")).setHeading();
     this.weightSetting(containerEl, s, L, "stale", "weightStale");
     this.weightSetting(containerEl, s, L, "orphan", "weightOrphan");
     this.weightSetting(containerEl, s, L, "duplicate", "weightDuplicate");
     this.weightSetting(containerEl, s, L, "avoidance", "weightAvoidance");
-    containerEl.createEl("p", {
-      cls: "pulse-muted",
-      text: t(L, "streakLine", {
+    new import_obsidian2.Setting(containerEl).setDesc(
+      t(L, "streakLine", {
         days: s.streakDays,
         last: s.lastSessionDate || "\u2014"
       })
-    });
+    );
   }
   weightSetting(containerEl, s, locale, key, nameKey) {
     new import_obsidian2.Setting(containerEl).setName(t(locale, nameKey)).addText(
@@ -922,8 +918,7 @@ var SessionModal = class extends import_obsidian3.Modal {
     if (!note && action !== "end") return;
     try {
       if (note) await this.handlers.onAction(note, action);
-    } catch (e) {
-      console.error(e);
+    } catch {
       return;
     }
     if (action === "open") {
@@ -1042,13 +1037,13 @@ var PulseView = class extends import_obsidian4.ItemView {
           this.onOpenNote?.(n.path);
         }
       };
-      const title = body.createEl("div", {
+      const title = body.createDiv({
         cls: "pulse-q-title",
         text: n.title
       });
       title.setAttr("title", n.path);
-      body.createEl("div", { cls: "pulse-q-explain", text: n.explain });
-      body.createEl("div", {
+      body.createDiv({ cls: "pulse-q-explain", text: n.explain });
+      body.createDiv({
         cls: "pulse-q-score",
         text: `${t(L, "score")} ${n.score.toFixed(1)}`
       });
@@ -1083,11 +1078,58 @@ var PulseView = class extends import_obsidian4.ItemView {
   }
 };
 
-// src/obsigravity-bridge.ts
+// src/ui/confirm-modal.ts
 var import_obsidian5 = require("obsidian");
+function confirmAction(app, message, confirmLabel, cancelLabel) {
+  return new Promise((resolve) => {
+    const modal = new ConfirmModal(
+      app,
+      message,
+      confirmLabel,
+      cancelLabel,
+      (ok) => resolve(ok)
+    );
+    modal.open();
+  });
+}
+var ConfirmModal = class extends import_obsidian5.Modal {
+  constructor(app, message, confirmLabel, cancelLabel, onDecide) {
+    super(app);
+    this.message = message;
+    this.confirmLabel = confirmLabel;
+    this.cancelLabel = cancelLabel;
+    this.onDecide = onDecide;
+    this.decided = false;
+  }
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.createEl("p", { text: this.message });
+    new import_obsidian5.Setting(contentEl).addButton(
+      (b) => b.setButtonText(this.cancelLabel).onClick(() => {
+        this.decided = true;
+        this.close();
+        this.onDecide(false);
+      })
+    ).addButton(
+      (b) => b.setButtonText(this.confirmLabel).setWarning().onClick(() => {
+        this.decided = true;
+        this.close();
+        this.onDecide(true);
+      })
+    );
+  }
+  onClose() {
+    this.contentEl.empty();
+    if (!this.decided) {
+      this.onDecide(false);
+    }
+  }
+};
+
+// src/obsigravity-bridge.ts
+var import_obsidian6 = require("obsidian");
 var OBSIGRAVITY_ID = "obsigravity";
-var BRAT_URL = "https://github.com/TfTHacker/obsidian42-brat";
-var OBSIGRAVITY_REPO = "https://github.com/reallygood83/obsigravity";
 function getObsigravity(app) {
   const plugins = app.plugins;
   if (!plugins) return null;
@@ -1095,18 +1137,12 @@ function getObsigravity(app) {
   return p ?? null;
 }
 function showObsigravityInstallGuide(locale) {
-  new import_obsidian5.Notice(t(locale, "obsigravityMissing"), 12e3);
-  console.info(
-    `[Note Sweep] Install Obsigravity via BRAT:
-1) Install BRAT: ${BRAT_URL}
-2) Add plugin: reallygood83/obsigravity
-3) Repo: ${OBSIGRAVITY_REPO}`
-  );
+  new import_obsidian6.Notice(t(locale, "obsigravityMissing"), 12e3);
 }
 async function openNoteInObsigravity(app, locale, notePath) {
   const file = app.vault.getAbstractFileByPath(notePath);
-  if (!(file instanceof import_obsidian5.TFile)) {
-    new import_obsidian5.Notice(t(locale, "deleteFailed"));
+  if (!(file instanceof import_obsidian6.TFile)) {
+    new import_obsidian6.Notice(t(locale, "deleteFailed"));
     return;
   }
   await app.workspace.getLeaf(false).openFile(file, { active: true });
@@ -1119,24 +1155,26 @@ async function openNoteInObsigravity(app, locale, notePath) {
     if (typeof og.pinNote === "function") {
       await og.pinNote(notePath.replace(/\\/g, "/"));
     }
-  } catch (e) {
-    console.warn("[Note Sweep] pinNote failed", e);
+  } catch {
   }
   try {
     if (typeof og.activateView === "function") {
       await og.activateView();
     } else {
-      await app.commands.executeCommandById("obsigravity:open-obsigravity");
+      const commands = app.commands;
+      const exec = commands?.executeCommandById;
+      if (typeof exec === "function") {
+        await Promise.resolve(exec.call(commands, "obsigravity:open-obsigravity"));
+      }
     }
-    new import_obsidian5.Notice(t(locale, "obsigravityOpened"), 6e3);
-  } catch (e) {
-    console.error("[Note Sweep] open Obsigravity failed", e);
-    new import_obsidian5.Notice(t(locale, "obsigravityUpdateFailed"), 8e3);
+    new import_obsidian6.Notice(t(locale, "obsigravityOpened"), 6e3);
+  } catch {
+    new import_obsidian6.Notice(t(locale, "obsigravityUpdateFailed"), 8e3);
   }
 }
 
 // src/main.ts
-var NoteSweepPlugin = class extends import_obsidian6.Plugin {
+var NoteSweepPlugin = class extends import_obsidian7.Plugin {
   constructor() {
     super(...arguments);
     this.settings = {
@@ -1228,10 +1266,10 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
       this.reschedule();
       if (shouldOfferCatchUpSession(this.settings)) {
         if (this.settings.scheduleAutoStart) {
-          new import_obsidian6.Notice(t(this.settings.locale, "catchUp"));
+          new import_obsidian7.Notice(t(this.settings.locale, "catchUp"));
           window.setTimeout(() => void this.startSession(), 600);
         } else {
-          new import_obsidian6.Notice(t(this.settings.locale, "catchUpManual"));
+          new import_obsidian7.Notice(t(this.settings.locale, "catchUpManual"));
         }
       }
     });
@@ -1293,18 +1331,18 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
     if (this.settings.lastSessionDate === todayKey() && this.settings.lastSessionCompleted) {
       return;
     }
-    new import_obsidian6.Notice(t(L, "scheduledTime"));
+    new import_obsidian7.Notice(t(L, "scheduledTime"));
     if (this.settings.scheduleAutoStart) {
       await this.startSession();
     }
   }
   async rescan() {
     const L = this.settings.locale;
-    new import_obsidian6.Notice(t(L, "scanning"));
+    new import_obsidian7.Notice(t(L, "scanning"));
     await this.index.fullRebuild();
     await this.rebuildQueue(false);
     this.refreshOpenViews();
-    new import_obsidian6.Notice(t(L, "scanComplete"));
+    new import_obsidian7.Notice(t(L, "scanComplete"));
   }
   async rebuildQueue(forceRescan) {
     if (forceRescan) await this.index.fullRebuild();
@@ -1332,27 +1370,31 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
   }
   async openNotePath(path) {
     const file = this.app.vault.getAbstractFileByPath(path);
-    if (file instanceof import_obsidian6.TFile) {
+    if (file instanceof import_obsidian7.TFile) {
       await this.app.workspace.getLeaf(false).openFile(file);
     }
   }
   async deleteNotePath(path) {
     const L = this.settings.locale;
     const file = this.app.vault.getAbstractFileByPath(path);
-    if (!(file instanceof import_obsidian6.TFile)) {
-      new import_obsidian6.Notice(t(L, "deleteFailed"));
+    if (!(file instanceof import_obsidian7.TFile)) {
+      new import_obsidian7.Notice(t(L, "deleteFailed"));
       return;
     }
-    const ok = window.confirm(t(L, "deleteConfirm", { path }));
+    const ok = await confirmAction(
+      this.app,
+      t(L, "deleteConfirm", { path }),
+      t(L, "delete"),
+      t(L, "cancel")
+    );
     if (!ok) return;
     try {
-      await this.app.vault.trash(file, true);
-      new import_obsidian6.Notice(t(L, "deleted", { path }));
+      await this.app.fileManager.trashFile(file);
+      new import_obsidian7.Notice(t(L, "deleted", { path }));
       await this.rebuildQueue(true);
       this.refreshOpenViews();
-    } catch (e) {
-      console.error(e);
-      new import_obsidian6.Notice(t(L, "deleteFailed"));
+    } catch {
+      new import_obsidian7.Notice(t(L, "deleteFailed"));
     }
   }
   /** Open note + Obsigravity sidebar (no intermediate prompt modal). */
@@ -1367,10 +1409,12 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
       leaf = existing[0];
     } else {
       leaf = workspace.getRightLeaf(false);
-      await leaf?.setViewState({ type: PULSE_VIEW_TYPE, active: true });
+      if (leaf) {
+        await leaf.setViewState({ type: PULSE_VIEW_TYPE, active: true });
+      }
     }
     if (leaf) {
-      workspace.revealLeaf(leaf);
+      workspace.setActiveLeaf(leaf, { focus: true });
       await this.rebuildQueue(false);
       this.refreshOpenViews();
     }
@@ -1383,7 +1427,7 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
     await this.rebuildQueue(false);
     const L = this.settings.locale;
     if (this.cachedQueue.length === 0) {
-      new import_obsidian6.Notice(t(L, "nothingToTriage"));
+      new import_obsidian7.Notice(t(L, "nothingToTriage"));
       return;
     }
     this.active = new ActiveSession(
@@ -1428,7 +1472,7 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
     this.modal = null;
     this.showStatusBar();
     const time = this.formatTime(this.active.remainingSec);
-    new import_obsidian6.Notice(t(this.settings.locale, "sessionPaused", { time }));
+    new import_obsidian7.Notice(t(this.settings.locale, "sessionPaused", { time }));
   }
   endActiveSession(auto) {
     if (!this.active) return;
@@ -1438,7 +1482,7 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
     this.active = null;
     this.modal = null;
     this.clearStatusBar();
-    if (auto) new import_obsidian6.Notice(t(this.settings.locale, "timeUp"));
+    if (auto) new import_obsidian7.Notice(t(this.settings.locale, "timeUp"));
     void this.finishSession(stats, completed);
   }
   formatTime(sec) {
@@ -1481,7 +1525,7 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
     if (!this.active) return;
     if (action === "open") {
       const file = this.app.vault.getAbstractFileByPath(note.path);
-      if (file instanceof import_obsidian6.TFile) {
+      if (file instanceof import_obsidian7.TFile) {
         await this.app.workspace.getLeaf(false).openFile(file);
       }
       this.active.markOpened();
@@ -1500,7 +1544,7 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
     if (action === "skip") return;
     if (action === "archive") {
       const file = this.app.vault.getAbstractFileByPath(note.path);
-      if (!(file instanceof import_obsidian6.TFile)) return;
+      if (!(file instanceof import_obsidian7.TFile)) return;
       const dest = archiveTargetPath(note.path, this.settings.archiveFolder);
       const folder = dest.slice(0, dest.lastIndexOf("/"));
       await this.ensureFolder(folder);
@@ -1511,7 +1555,7 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
         finalDest = `${folder}/${base}-${stamp}.md`;
       }
       await this.app.fileManager.renameFile(file, finalDest);
-      new import_obsidian6.Notice(t(L, "archived", { path: finalDest }));
+      new import_obsidian7.Notice(t(L, "archived", { path: finalDest }));
     }
   }
   async ensureFolder(path) {
@@ -1543,7 +1587,7 @@ var NoteSweepPlugin = class extends import_obsidian6.Plugin {
     await this.rebuildQueue(false);
     this.refreshOpenViews();
     const done = stats.opened + stats.archived + stats.snoozed + stats.skipped;
-    new import_obsidian6.Notice(
+    new import_obsidian7.Notice(
       t(this.settings.locale, "sessionDone", {
         done,
         target: stats.target,
